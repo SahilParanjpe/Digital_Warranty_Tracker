@@ -98,39 +98,39 @@ def seed_data(conn):
     products = [
         (
             1, 1, "Apple MacBook Pro 16\" M3 Max", "Apple", "MBP16-M3M-1TB", "C02G4589MD6R",
-            "Laptops & Computers", "2025-11-15", 3499.00, "Apple Fifth Avenue",
+            "Laptops & Computers", "2025-11-15", 319900.00, "Apple BKC Mumbai",
             36, "2025-11-15", "2028-11-15", "extended", "active", "verified",
             "AppleCare+ Plan Confirmed. Active coverage valid until Nov 2028."
         ),
         (
             2, 1, "Samsung Galaxy S25 Ultra 512GB", "Samsung", "SM-S928B/DS", "R5CW209KL99",
-            "Smartphones & Tablets", "2025-08-10", 1379.99, "Samsung Experience Store",
+            "Smartphones & Tablets", "2025-08-10", 134999.00, "Samsung Opera House",
             24, "2025-08-10", "2027-08-10", "standard", "active", "verified",
             "Verified against Samsung Knox IMEI register."
         ),
         (
             3, 1, "Sony Alpha A7 IV Mirrorless Camera", "Sony", "ILCE-7M4/BQ", "33918204",
-            "Cameras & Audio", "2024-08-01", 2498.00, "B&H Photo Video",
+            "Cameras & Audio", "2024-08-01", 219900.00, "Reliance Digital",
             24, "2024-08-01", "2026-08-01", "standard", "expiring_soon", "verified",
             "Warranty expiring in 7 days! Reminder scheduled."
         ),
         (
             4, 1, "Dell UltraSharp 32 4K USB-C Monitor", "Dell", "U3223QE", "CN-0F74W1-74445",
-            "Workstations & Displays", "2023-05-10", 879.50, "Dell Official Store",
+            "Workstations & Displays", "2023-05-10", 74500.00, "Dell Exclusive Store",
             36, "2023-05-10", "2026-05-10", "standard", "expired", "verified",
             "Warranty expired 2 months ago. Extended coverage option eligible."
         ),
         (
             5, 1, "Dyson V15 Detect Absolute Vacuum", "Dyson", "368340-01", "649-US-J49821A",
-            "Home Appliances", "2025-01-20", 749.99, "Dyson Demo Store",
+            "Home Appliances", "2025-01-20", 65900.00, "Dyson Demo Store Select Citywalk",
             24, "2025-01-20", "2027-01-20", "standard", "active", "verified",
             "Motor and digital filter covered under Dyson Direct guarantee."
         ),
         (
             6, 1, "LG OLED 65\" C4 4K Smart TV", "LG", "OLED65C4PUA", "404RMKCY8912",
-            "Television & Display", "2025-04-12", 1899.00, "Best Buy",
+            "Television & Display", "2025-04-12", 169900.00, "Croma Electronics",
             24, "2025-04-12", "2027-04-12", "standard", "active", "verified",
-            "Retail invoice and serial matched with LG North America register."
+            "Retail invoice and serial matched with LG India register."
         )
     ]
     cur.executemany("""
@@ -143,26 +143,26 @@ def seed_data(conn):
         (
             1, 1, "Apple_Receipt_INV-88291.pdf", "/static/uploads/invoices/apple_mbp_receipt.pdf",
             420, "application/pdf",
-            "APPLE STORE 5TH AVE\nRECEIPT #INV-88291\nDATE: 2025-11-15\nITEM: MACBOOK PRO 16 M3 MAX\nS/N: C02G4589MD6R\nTOTAL: $3,499.00\nWARRANTY: APPLECARE+ 3 YR",
-            "Apple Fifth Avenue", "2025-11-15", 3499.00, "C02G4589MD6R", 0
+            "APPLE BKC MUMBAI\nRECEIPT #INV-88291\nDATE: 2025-11-15\nITEM: MACBOOK PRO 16 M3 MAX\nS/N: C02G4589MD6R\nTOTAL: ₹3,19,900.00\nWARRANTY: APPLECARE+ 3 YR",
+            "Apple BKC Mumbai", "2025-11-15", 319900.00, "C02G4589MD6R", 0
         ),
         (
             2, 2, "SamsungStore_Tax_Invoice_9941.jpg", "/static/uploads/invoices/samsung_invoice.jpg",
             1280, "image/jpeg",
-            "SAMSUNG EXPERIENCE STORE\nINVOICE 9941-K\nDATE: 2025-08-10\nDEVICE: SM-S928B/DS GALAXY S25 ULTRA\nIMEI/SN: R5CW209KL99\nAMOUNT: $1,379.99\nWARRANTY: 24 MONTHS",
-            "Samsung Experience Store", "2025-08-10", 1379.99, "R5CW209KL99", 0
+            "SAMSUNG OPERA HOUSE\nINVOICE 9941-K\nDATE: 2025-08-10\nDEVICE: SM-S928B/DS GALAXY S25 ULTRA\nIMEI/SN: R5CW209KL99\nAMOUNT: ₹1,34,999.00\nWARRANTY: 24 MONTHS",
+            "Samsung Opera House", "2025-08-10", 134999.00, "R5CW209KL99", 0
         ),
         (
-            3, 3, "BH_Photo_Invoice_20240801.pdf", "/static/uploads/invoices/bh_sony_receipt.pdf",
+            3, 3, "Reliance_Digital_Invoice_20240801.pdf", "/static/uploads/invoices/bh_sony_receipt.pdf",
             310, "application/pdf",
-            "B&H PHOTO VIDEO NYC\nORDER 9928194\nDATE: 08/01/2024\nSONY A7 IV BODY\nSERIAL: 33918204\nTOTAL: $2,498.00\nMFG WARRANTY: 2 YEARS",
-            "B&H Photo Video", "2024-08-01", 2498.00, "33918204", 1
+            "RELIANCE DIGITAL STORE\nORDER 9928194\nDATE: 08/01/2024\nSONY A7 IV BODY\nSERIAL: 33918204\nTOTAL: ₹2,19,900.00\nMFG WARRANTY: 2 YEARS",
+            "Reliance Digital", "2024-08-01", 219900.00, "33918204", 1
         ),
         (
             4, 5, "Dyson_Order_Confirmation.pdf", "/static/uploads/invoices/dyson_receipt.pdf",
             195, "application/pdf",
-            "DYSON DIRECT\nORDER #DY-98102\nPURCHASE DATE: 2025-01-20\nDYSON V15 DETECT\nS/N: 649-US-J49821A\nPRICE: $749.99",
-            "Dyson Demo Store", "2025-01-20", 749.99, "649-US-J49821A", 0
+            "DYSON DIRECT INDIA\nORDER #DY-98102\nPURCHASE DATE: 2025-01-20\nDYSON V15 DETECT\nS/N: 649-US-J49821A\nPRICE: ₹65,900.00",
+            "Dyson Demo Store", "2025-01-20", 65900.00, "649-US-J49821A", 0
         )
     ]
     cur.executemany("""
@@ -184,14 +184,14 @@ def seed_data(conn):
             "Mini-LED backlight flickering on the right side of the screen when brightness exceeds 70%.",
             "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=600&q=80",
             "service_scheduled", "Approved for direct top-case & display panel replacement under AppleCare+ coverage.",
-            "Replacement panel allocated to Metro Central Service Hub", 890.0, 4
+            "Replacement panel allocated to Metro Central Service Hub", 64900.0, 4
         ),
         (
             3, "CLM-2026-0012", 5, 1, "Battery / Motor Cut-off",
             "Suction motor pulsing and shutting down after 3 minutes in boost mode.",
             "https://images.unsplash.com/photo-1558317374-067fb5f30001?auto=format&fit=crop&w=600&q=80",
             "resolved", "Battery pack and cyclone filter assembly replaced free of charge.",
-            "Resolved and returned to owner via courier", 145.0, 4
+            "Resolved and returned to owner via courier", 12500.0, 4
         )
     ]
     cur.executemany("""
@@ -278,10 +278,10 @@ def seed_data(conn):
     # 8. Activity Logs
     activity_logs = [
         (1, 1, "Claim Filed", "claim", 1, "Alex Vance submitted claim CLM-2026-0081 for Sony A7 IV."),
-        (2, 4, "Claim Approved", "claim", 2, "Warranty Admin Elena approved claim CLM-2026-0045 for $890.00."),
+        (2, 4, "Claim Approved", "claim", 2, "Warranty Admin Elena approved claim CLM-2026-0045 for ₹64,900.00."),
         (3, 2, "Service Assigned", "service", 1, "Sarah Connor assigned Service Request #SR-2026-104 to David Miller."),
         (4, 3, "Repair In Progress", "service", 1, "Tech David Miller updated SR-2026-104: Parts received, disassembly started."),
-        (5, 1, "OCR Invoice Uploaded", "invoice", 1, "OCR successfully extracted Apple Fifth Ave invoice data with 99.4% confidence.")
+        (5, 1, "OCR Invoice Uploaded", "invoice", 1, "OCR successfully extracted Apple BKC Mumbai invoice data with 99.4% confidence.")
     ]
     cur.executemany("""
         INSERT INTO activity_logs (id, user_id, action, entity_type, entity_id, details)

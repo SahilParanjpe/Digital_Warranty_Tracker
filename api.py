@@ -255,7 +255,7 @@ def create_product(data):
                 invoice_data.get('file_path', f"/static/uploads/invoices/{serial}.pdf"),
                 invoice_data.get('file_size_kb', 320),
                 invoice_data.get('mime_type', 'image/jpeg'),
-                invoice_data.get('ocr_raw_text', f"RECEIPT\nSTORE: {retailer}\nDATE: {purchase_date_str}\nTOTAL: ${price:.2f}\nS/N: {serial}"),
+                invoice_data.get('ocr_raw_text', f"RECEIPT\nSTORE: {retailer}\nDATE: {purchase_date_str}\nTOTAL: ₹{price:,.2f} INR\nS/N: {serial}"),
                 retailer,
                 purchase_date_str,
                 price,
@@ -314,38 +314,50 @@ def parse_ocr_simulated(data):
             'confidence': 98.4,
             'category': 'Workstations & Displays'
         },
+        'apple': {
+            'store': 'Apple BKC Mumbai',
+            'product_name': 'Apple Studio Display 27" 5K',
+            'brand': 'Apple',
+            'model': 'MK0U3LL/A',
+            'serial': 'DY3X799QPL',
+            'date': '2025-10-14',
+            'price': 149900.00,
+            'duration_months': 12,
+            'confidence': 98.4,
+            'category': 'Workstations & Displays'
+        },
         'sony': {
-            'store': 'B&H Photo Video New York',
+            'store': 'Reliance Digital Mumbai',
             'product_name': 'Sony WH-1000XM5 Wireless Headphones',
             'brand': 'Sony',
             'model': 'WH1000XM5/B',
             'serial': '5849302198',
             'date': '2025-12-05',
-            'price': 398.00,
+            'price': 29990.00,
             'duration_months': 12,
             'confidence': 96.8,
             'category': 'Cameras & Audio'
         },
         'samsung': {
-            'store': 'Samsung Electronics Official',
+            'store': 'Samsung Opera House Bengaluru',
             'product_name': 'Samsung Odyssey Neo G9 Gaming Monitor',
             'brand': 'Samsung',
             'model': 'LS57CG952NNXZA',
             'serial': 'SAM9820491L',
             'date': '2026-01-18',
-            'price': 1799.99,
+            'price': 129999.00,
             'duration_months': 24,
             'confidence': 99.1,
             'category': 'Workstations & Displays'
         },
         'dyson': {
-            'store': 'Dyson Flagship Store',
+            'store': 'Dyson Demo Store Delhi',
             'product_name': 'Dyson Airwrap Multi-Styler Complete',
             'brand': 'Dyson',
             'model': 'HS05-COPPER',
             'serial': 'DYS-8821-AW99',
             'date': '2025-09-22',
-            'price': 599.99,
+            'price': 49900.00,
             'duration_months': 24,
             'confidence': 97.5,
             'category': 'Home Appliances'
@@ -367,13 +379,13 @@ def parse_ocr_simulated(data):
     ocr_lines = [
         f"*** OFFICIAL TAX INVOICE / PROOF OF PURCHASE ***",
         f"MERCHANT: {extracted['store']}",
-        f"DATE OF SALE: {extracted['date']}  |  TAX ID: 47-9281-01",
+        f"DATE OF SALE: {extracted['date']}  |  GSTIN: 27AABCS1429B1Z",
         f"ITEM: {extracted['product_name']}",
         f"MODEL: {extracted['model']}  |  SERIAL NO: {extracted['serial']}",
-        f"PRICE: ${extracted['price']:.2f} USD",
-        f"PAYMENT METHOD: VISA ENDING IN *8821  |  AUTH CODE: 934201",
+        f"PRICE: ₹{extracted['price']:,.2f} INR",
+        f"PAYMENT METHOD: UPI / CARD ENDING *8821  |  AUTH CODE: 934201",
         f"MANUFACTURER WARRANTY: {extracted['duration_months']} MONTHS LIMITED COVERAGE",
-        f"RETURN POLICY: 30 DAYS WITH RECEIPT"
+        f"RETURN POLICY: 30 DAYS WITH RETAIL RECEIPT"
     ]
 
     return {
@@ -886,7 +898,72 @@ def get_dashboard_stats(user_id=None, role='product_owner'):
 
     conn.close()
 
-    # Return full stats matching the reference dashboard metrics
+    # Return full stats matching the reference dashboard metrics with role awareness
+    role_metrics = {
+        "product_owner": {
+            "title": "My Personal Warranty Vault",
+            "kpi1_title": "TOTAL VAULT VALUE",
+            "kpi1_val": f"₹{int(total_active_value):,}",
+            "kpi1_sub": f"{active_count} active devices protected",
+            "kpi2_title": "ACTIVE CLAIMS QTD",
+            "kpi2_val": str(total_claims),
+            "kpi2_sub": f"{pending_claims} under review",
+            "kpi3_title": "VERIFICATION RATE",
+            "kpi3_val": "100%",
+            "kpi3_sub": "All serial numbers certified",
+            "kpi4_title": "EXPIRING IN 30 DAYS",
+            "kpi4_val": f"{expiring_soon_count} Device",
+            "kpi4_sub": "Sony A7 IV requires action"
+        },
+        "service_center_staff": {
+            "title": "Service Dispatch & Bay Intake Desk",
+            "kpi1_title": "PENDING INTAKE QUEUE",
+            "kpi1_val": "3 Tickets",
+            "kpi1_sub": "Awaiting technician allocation",
+            "kpi2_title": "ACTIVE SERVICE BAYS",
+            "kpi2_val": "4 of 6 Benches",
+            "kpi2_sub": "67% bay utilization",
+            "kpi3_title": "ON-DUTY TECHNICIANS",
+            "kpi3_val": "3 Techs",
+            "kpi3_sub": "David M., Lucas B., Andre K.",
+            "kpi4_title": "AVG SERVICE SLA",
+            "kpi4_val": "1.8 Days",
+            "kpi4_sub": "94.2% on-time completion"
+        },
+        "service_technician": {
+            "title": "Senior Technician Workbench",
+            "kpi1_title": "JOBS ASSIGNED TODAY",
+            "kpi1_val": "4 Repairs",
+            "kpi1_sub": "2 high priority",
+            "kpi2_title": "CURRENTLY ON BENCH",
+            "kpi2_val": f"{active_service} Active",
+            "kpi2_sub": "MacBook Pro screen assembly",
+            "kpi3_title": "FIRST-TIME FIX RATE",
+            "kpi3_val": "96.4%",
+            "kpi3_sub": "Passed diagnostic QC",
+            "kpi4_title": "PARTS REQUISITION",
+            "kpi4_val": "1 Pending",
+            "kpi4_sub": "True Tone sensor module"
+        },
+        "warranty_admin": {
+            "title": "Warranty Governance & Claims Adjudication",
+            "kpi1_title": "PENDING CLAIMS VALUE",
+            "kpi1_val": "₹1,42,800",
+            "kpi1_sub": f"{pending_claims} claims awaiting decision",
+            "kpi2_title": "APPROVED PAYOUTS QTD",
+            "kpi2_val": "₹18,65,000",
+            "kpi2_sub": f"{resolved_claims + 39} settled claims",
+            "kpi3_title": "MANUFACTURER RULES",
+            "kpi3_val": "6 Brands",
+            "kpi3_sub": "Apple, Samsung, Sony, Dell, Dyson, LG",
+            "kpi4_title": "FRAUD / REJECTION RATE",
+            "kpi4_val": "3.8%",
+            "kpi4_sub": "Strict proof verification"
+        }
+    }
+
+    current_role_metric = role_metrics.get(role, role_metrics["product_owner"])
+
     return {
         "success": True,
         "metrics": {
@@ -896,20 +973,21 @@ def get_dashboard_stats(user_id=None, role='product_owner'):
             "total_portfolio_value": round(total_active_value, 2),
             "claims_rate": "94.6%",
             "coverage_health": "98.2%",
-            "avg_resolution_days": "2.4 days",
+            "avg_resolution_days": "2.1 days",
             "active_service_requests": active_service,
             "resolved_claims": resolved_claims
         },
+        "role_specific": current_role_metric,
         "trends": {
             "months": ["AUG", "SEP", "OCT", "NOV", "DEC", "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL"],
             "actual_values": [340, 390, 410, 480, 520, 560, 610, 680, 720, 790, 840, 910],
             "forecast_values": [340, 400, 420, 490, 530, 570, 630, 690, 740, 810, 880, 950]
         },
         "categories_breakdown": [
-            {"label": "Laptops & Computers", "value": "$3,499.00", "delta": "+22%", "active": 1},
-            {"label": "Cameras & Audio", "value": "$2,498.00", "delta": "+14%", "active": 1},
-            {"label": "Home Appliances", "value": "$749.99", "delta": "-6%", "active": 1},
-            {"label": "Under Claim", "value": "$1,120.00", "delta": "+31%", "active": 2}
+            {"label": "Laptops & Computers", "value": "₹3,19,900", "delta": "+22%", "active": 1},
+            {"label": "Cameras & Audio", "value": "₹2,19,900", "delta": "+14%", "active": 1},
+            {"label": "Smartphones & Tablets", "value": "₹1,34,999", "delta": "+18%", "active": 1},
+            {"label": "Under Claim / Repair", "value": "₹83,400", "delta": "+31%", "active": 2}
         ],
         "activities": activities
     }, 200

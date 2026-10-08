@@ -107,7 +107,9 @@ class WarrantyServerHandler(SimpleHTTPRequestHandler):
                 res, code = api.get_reminders(uid)
                 self.send_json(res, code)
             elif path == '/api/dashboard/stats':
-                res, code = api.get_dashboard_stats()
+                uid = int(params.get('user_id', 1))
+                role = params.get('role', 'product_owner')
+                res, code = api.get_dashboard_stats(uid, role)
                 self.send_json(res, code)
             else:
                 self.send_json({"error": "Endpoint not found"}, 404)

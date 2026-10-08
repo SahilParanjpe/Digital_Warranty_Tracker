@@ -99,6 +99,106 @@ function showView(viewName) {
   }
 }
 
+// Role Configuration Metadata for 4 Distinct Stakeholder Dashboards
+const roleMetadata = {
+  product_owner: {
+    icon: '👤',
+    pill: 'Product Owner',
+    pillClass: 'bg-blue-100 text-blue-800',
+    title: 'Personal Warranty Vault',
+    desc: 'Managing personal warranty vault: register products with OCR, track expiry countdowns, view invoices, and file claims.',
+    greeting: 'Personal Warranty Vault · You have 1 warranty expiring this week and 1 claim under administrator review.',
+    actions: `
+      <button onclick="openOcrModal()" class="btn-lime text-xs font-bold inline-flex items-center gap-1.5 shadow-xs">
+        <span>⚡</span>
+        <span>Instant OCR Scan</span>
+      </button>
+      <button onclick="openRegisterProductModal()" class="bg-[#111418] hover:bg-black text-white text-xs font-semibold px-4 py-2 rounded-full transition shadow-xs">
+        + Register Product
+      </button>
+      <button onclick="openClaimModal()" class="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-xs font-semibold px-4 py-2 rounded-full transition shadow-2xs">
+        + File Claim
+      </button>
+      <button onclick="openRemindersDrawer()" class="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-xs font-semibold px-4 py-2 rounded-full transition shadow-2xs">
+        🔔 Expiry Alerts
+      </button>
+    `,
+    targetTab: 'products'
+  },
+  service_center_staff: {
+    icon: '🏢',
+    pill: 'Service Center Staff',
+    pillClass: 'bg-amber-100 text-amber-800',
+    title: 'Service Dispatch & Intake Desk',
+    desc: 'Receiving incoming service requests, allocating technician benches, monitoring service SLA, and scheduling workshop bays.',
+    greeting: 'Service Intake Desk · 3 pending service tickets require bay scheduling and technician allocation today.',
+    actions: `
+      <button onclick="openServiceRequestModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-full transition shadow-xs inline-flex items-center gap-1.5">
+        <span>⚡</span>
+        <span>Dispatch Technician</span>
+      </button>
+      <button onclick="openServiceRequestModal()" class="bg-[#111418] hover:bg-black text-white text-xs font-semibold px-4 py-2 rounded-full transition shadow-xs">
+        + New Service Intake
+      </button>
+      <button onclick="setDashboardTab('service')" class="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-xs font-semibold px-4 py-2 rounded-full transition shadow-2xs">
+        🗓️ Bay Schedule
+      </button>
+      <button onclick="openVerifyModal()" class="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-xs font-semibold px-4 py-2 rounded-full transition shadow-2xs">
+        🔍 Verify Device Serial
+      </button>
+    `,
+    targetTab: 'service'
+  },
+  service_technician: {
+    icon: '🔧',
+    pill: 'Service Technician',
+    pillClass: 'bg-emerald-100 text-emerald-800',
+    title: 'Senior Technician Workbench',
+    desc: 'Performing authorized repairs, updating diagnostic logs, testing replaced components, and completing repair orders.',
+    greeting: 'Technician Workbench · You have 1 active bench repair in progress (MacBook Pro) and 3 queued hardware jobs.',
+    actions: `
+      <button onclick="focusTechnicianBench()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-full transition shadow-xs inline-flex items-center gap-1.5">
+        <span>⚡</span>
+        <span>Complete Bench Job ✓</span>
+      </button>
+      <button onclick="setDashboardTab('service')" class="bg-[#111418] hover:bg-black text-white text-xs font-semibold px-4 py-2 rounded-full transition shadow-xs">
+        📝 Update Diagnostic Notes
+      </button>
+      <button onclick="showToast('Requisition logged: Apple True Tone display module sent to parts inventory')" class="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-xs font-semibold px-4 py-2 rounded-full transition shadow-2xs">
+        📦 Requisition Parts
+      </button>
+      <button onclick="showToast('Hardware diagnostics test passed: 100% QC certified')" class="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-xs font-semibold px-4 py-2 rounded-full transition shadow-2xs">
+        🛠️ Run QC Bench Test
+      </button>
+    `,
+    targetTab: 'service'
+  },
+  warranty_admin: {
+    icon: '🛡️',
+    pill: 'Warranty Administrator',
+    pillClass: 'bg-purple-100 text-purple-800',
+    title: 'Warranty Governance & Claims Adjudication',
+    desc: 'Setting manufacturer coverage rules, deciding customer claims, approving warranty disbursements, and monitoring claim validity.',
+    greeting: 'Governance & Claims Desk · 2 claims submitted by product owners require coverage verification and decision.',
+    actions: `
+      <button onclick="setDashboardTab('claims')" class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-4 py-2 rounded-full transition shadow-xs inline-flex items-center gap-1.5">
+        <span>🛡️</span>
+        <span>Adjudicate Claims</span>
+      </button>
+      <button onclick="openRuleModal()" class="bg-[#111418] hover:bg-black text-white text-xs font-semibold px-4 py-2 rounded-full transition shadow-xs">
+        + Configure Policy Rule
+      </button>
+      <button onclick="setDashboardTab('rules')" class="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-xs font-semibold px-4 py-2 rounded-full transition shadow-2xs">
+        📜 Manufacturer Policies
+      </button>
+      <button onclick="shareSnapshot()" class="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-xs font-semibold px-4 py-2 rounded-full transition shadow-2xs">
+        ⚖️ Export Claims Ledger
+      </button>
+    `,
+    targetTab: 'claims'
+  }
+};
+
 function switchRole(roleKey) {
   if (!demoUsers[roleKey]) return;
   state.currentRole = roleKey;
@@ -124,10 +224,65 @@ function switchRole(roleKey) {
     activeBtn.className = 'px-2.5 py-1 rounded-md font-medium transition-all text-white bg-blue-600 shadow-xs';
   }
 
+  // Update Stakeholder Context Banner
+  const meta = roleMetadata[roleKey] || roleMetadata.product_owner;
+  const iconEl = document.getElementById('stakeholder-icon');
+  const pillEl = document.getElementById('stakeholder-role-pill');
+  const descEl = document.getElementById('stakeholder-desc');
+  const subtextEl = document.getElementById('greeting-subtext');
+  const actionBtnsEl = document.getElementById('header-action-buttons');
+
+  if (iconEl) iconEl.textContent = meta.icon;
+  if (pillEl) {
+    pillEl.textContent = meta.pill;
+    pillEl.className = `px-2 py-0.5 rounded-full text-[10px] font-bold ${meta.pillClass}`;
+  }
+  if (descEl) descEl.textContent = meta.desc;
+  if (subtextEl) subtextEl.textContent = meta.greeting;
+  if (actionBtnsEl) actionBtnsEl.innerHTML = meta.actions;
+
+  // Visual emphasis on role-prioritized section
+  highlightRoleSection(meta.targetTab);
+
   showToast(`Switched view to ${state.currentUser.title}: ${state.currentUser.name}`);
+  loadDashboardStats();
   loadProducts();
   loadClaims();
   loadServiceRequests();
+}
+
+function highlightRoleSection(tabKey) {
+  const sectionIds = ['section-products', 'section-claims', 'section-service', 'section-rules'];
+  sectionIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('ring-2', 'ring-blue-500', 'ring-purple-500', 'ring-emerald-500');
+  });
+
+  const targetMap = {
+    products: 'section-products',
+    service: 'section-service',
+    claims: 'section-claims',
+    rules: 'section-rules'
+  };
+  const targetId = targetMap[tabKey];
+  const targetEl = document.getElementById(targetId);
+  if (targetEl) {
+    const ringClass = tabKey === 'claims' ? 'ring-purple-500' : tabKey === 'service' ? 'ring-emerald-500' : 'ring-blue-500';
+    targetEl.classList.add('ring-2', ringClass);
+  }
+}
+
+function focusTechnicianBench() {
+  setDashboardTab('service');
+  showToast('Focusing on Technician Workbench repairs...');
+  setTimeout(() => {
+    const firstActionBtn = document.querySelector('#service-table-body button');
+    if (firstActionBtn) {
+      firstActionBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      firstActionBtn.classList.add('ring-4', 'ring-emerald-400');
+      setTimeout(() => firstActionBtn.classList.remove('ring-4', 'ring-emerald-400'), 2500);
+    }
+  }, 400);
 }
 
 function updateUserUI() {
@@ -204,7 +359,7 @@ function setTimeRange(range) {
 
 async function loadDashboardStats() {
   try {
-    const res = await fetch('/api/dashboard/stats');
+    const res = await fetch(`/api/dashboard/stats?role=${state.currentRole}&user_id=${state.currentUser.id}`);
     const json = await res.json();
     if (json.success) {
       state.stats = json;
@@ -219,13 +374,48 @@ function renderStatsUI(data) {
   const m = data.metrics;
   if (!m) return;
 
-  const kpiVal = document.getElementById('kpi-portfolio-value');
-  const kpiActive = document.getElementById('kpi-active-count');
-  const kpiClaims = document.getElementById('kpi-claims-count');
+  // Populate Role-Specific KPI Cards
+  const r = data.role_specific;
+  if (r) {
+    const kpi1Title = document.getElementById('kpi1-title');
+    const kpi1Val = document.getElementById('kpi-portfolio-value');
+    const kpi1Sub = document.getElementById('kpi-active-count');
 
-  if (kpiVal) kpiVal.textContent = `$${m.total_portfolio_value.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-  if (kpiActive) kpiActive.textContent = `${m.total_active_warranties} active warranties`;
-  if (kpiClaims) kpiClaims.textContent = `${m.resolved_claims + 183}`;
+    const kpi2Title = document.getElementById('kpi2-title');
+    const kpi2Val = document.getElementById('kpi-claims-count');
+    const kpi2Sub = document.getElementById('kpi2-sub');
+
+    const kpi3Title = document.getElementById('kpi3-title');
+    const kpi3Val = document.getElementById('kpi3-val');
+    const kpi3Sub = document.getElementById('kpi3-sub');
+
+    const kpi4Title = document.getElementById('kpi4-title');
+    const kpi4Val = document.getElementById('kpi4-val');
+    const kpi4Sub = document.getElementById('kpi4-sub');
+
+    if (kpi1Title) kpi1Title.textContent = r.kpi1_title;
+    if (kpi1Val) kpi1Val.textContent = r.kpi1_val;
+    if (kpi1Sub) kpi1Sub.textContent = r.kpi1_sub;
+
+    if (kpi2Title) kpi2Title.textContent = r.kpi2_title;
+    if (kpi2Val) kpi2Val.textContent = r.kpi2_val;
+    if (kpi2Sub) kpi2Sub.textContent = r.kpi2_sub;
+
+    if (kpi3Title) kpi3Title.textContent = r.kpi3_title;
+    if (kpi3Val) kpi3Val.textContent = r.kpi3_val;
+    if (kpi3Sub) kpi3Sub.textContent = r.kpi3_sub;
+
+    if (kpi4Title) kpi4Title.textContent = r.kpi4_title;
+    if (kpi4Val) kpi4Val.textContent = r.kpi4_val;
+    if (kpi4Sub) kpi4Sub.textContent = r.kpi4_sub;
+  } else {
+    const kpiVal = document.getElementById('kpi-portfolio-value');
+    const kpiActive = document.getElementById('kpi-active-count');
+    const kpiClaims = document.getElementById('kpi-claims-count');
+    if (kpiVal) kpiVal.textContent = `₹${Math.round(m.total_portfolio_value).toLocaleString('en-IN')}`;
+    if (kpiActive) kpiActive.textContent = `${m.total_active_warranties} active warranties`;
+    if (kpiClaims) kpiClaims.textContent = `${m.resolved_claims + 183}`;
+  }
 
   // Banner counts
   const bannerExp = document.getElementById('banner-expiring-count');
@@ -915,12 +1105,16 @@ function viewInvoice(productId, productName, filename, serial, price) {
   document.getElementById('invoice-modal-title').textContent = `Invoice: ${productName}`;
   document.getElementById('invoice-modal-subtitle').textContent = `File: ${filename} · Serial: ${serial}`;
   
+  const numPrice = parseFloat(price);
+  const formattedPrice = isNaN(numPrice) ? price : `₹${numPrice.toLocaleString('en-IN')}`;
+
   const content = document.getElementById('invoice-modal-content');
   content.textContent = `*** OFFICIAL PROOF OF PURCHASE & WARRANTY CERTIFICATE ***\n\n` +
     `DEVICE: ${productName}\n` +
     `SERIAL NUMBER: ${serial}\n` +
     `INVOICE FILE: ${filename}\n` +
-    `TOTAL AMOUNT: $${parseFloat(price).toFixed(2)} USD\n` +
+    `PURCHASE PRICE: ${formattedPrice} (INR)\n` +
+    `CURRENCY: Indian Rupee (₹)\n` +
     `VERIFICATION STATUS: Confirmed in SQLite Database (invoices table)\n\n` +
     `WARRANTY POLICY: Keep this digital receipt safe for all warranty claims and repair requests.`;
 
@@ -929,6 +1123,48 @@ function viewInvoice(productId, productName, filename, serial, price) {
 
   document.getElementById('modal-invoice')?.classList.remove('hidden');
 }
+
+// -------------------------------------------------------------
+// COVERAGE RULE CONFIGURATION (WARRANTY ADMINISTRATOR)
+// -------------------------------------------------------------
+function openRuleModal() {
+  document.getElementById('modal-rule')?.classList.remove('hidden');
+}
+
+async function handleRuleSubmit(e) {
+  e.preventDefault();
+  const payload = {
+    manufacturer: document.getElementById('rule-mfg').value.trim(),
+    category: document.getElementById('rule-category').value,
+    standard_warranty_months: parseInt(document.getElementById('rule-months').value || 12),
+    grace_period_days: parseInt(document.getElementById('rule-grace').value || 30),
+    accidental_damage_covered: document.getElementById('rule-adh').checked,
+    requires_original_invoice: document.getElementById('rule-invoice-req').checked,
+    extended_warranty_allowed: document.getElementById('rule-extended').checked,
+    terms_summary: document.getElementById('rule-terms').value.trim(),
+    user_id: state.currentUser.id
+  };
+
+  try {
+    const res = await fetch('/api/rules', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const json = await res.json();
+    if (json.success) {
+      showToast(`Policy rule for ${payload.manufacturer} configured successfully!`);
+      closeModal('modal-rule');
+      loadRules();
+      loadDashboardStats();
+    } else {
+      alert(`Error: ${json.error}`);
+    }
+  } catch (err) {
+    console.error('Failed to configure rule:', err);
+  }
+}
+
 
 // -------------------------------------------------------------
 // AUTH MODAL & QUICK LOGIN

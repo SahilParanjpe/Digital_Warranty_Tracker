@@ -400,25 +400,48 @@
       <!-- Dashboard Body -->
       <div class="p-6 md:p-8 space-y-6">
 
+        <!-- STAKEHOLDER CONTEXT BANNER -->
+        <div id="stakeholder-banner" class="p-4 rounded-2xl bg-white border border-gray-200/90 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3 transition-all">
+          <div class="flex items-center gap-3">
+            <span class="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 font-bold flex items-center justify-center text-lg" id="stakeholder-icon">👤</span>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-gray-500">STAKEHOLDER DASHBOARD VIEW</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800" id="stakeholder-role-pill">Product Owner</span>
+              </div>
+              <p class="text-xs text-gray-600 mt-0.5" id="stakeholder-desc">
+                Managing personal warranty vault: register products with OCR, track expiry countdowns, view invoices, and file claims.
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 text-xs">
+            <span class="text-gray-400">Currency:</span>
+            <span class="font-bold text-gray-900 bg-gray-100 px-2.5 py-1 rounded-lg border border-gray-200">₹ INR (Rupees)</span>
+          </div>
+        </div>
+
         <!-- GREETING BANNER matching Reference Image 2 -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div class="text-[11px] font-bold uppercase tracking-wider text-gray-500">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-gray-500" id="header-date">
               SATURDAY · 25 JULY 2026
             </div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight mt-0.5">
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight mt-0.5" id="header-greeting-line">
               Good morning, <span id="greeting-name">Alex</span>
             </h1>
-            <p class="text-xs sm:text-sm text-gray-600 mt-1">
-              You have <strong class="text-gray-900 font-bold" id="banner-expiring-count">1 warranty</strong> expiring this week and <strong class="text-gray-900 font-bold" id="banner-queue-count">2 service requests</strong> queued.
+            <p class="text-xs sm:text-sm text-gray-600 mt-1" id="greeting-subtext">
+              Personal Warranty Vault · You have <strong class="text-gray-900 font-bold" id="banner-expiring-count">1 warranty</strong> expiring this week and <strong class="text-gray-900 font-bold" id="banner-queue-count">2 service requests</strong> queued.
             </p>
           </div>
 
-          <!-- Right Action Pill Buttons matching Reference Image 2 ("Log activity", "Share snapshot") -->
-          <div class="flex items-center gap-2.5">
+          <!-- Stakeholder Quick Action Buttons -->
+          <div class="flex flex-wrap items-center gap-2.5" id="header-action-buttons">
             <button onclick="openOcrModal()" class="btn-lime text-xs font-bold inline-flex items-center gap-1.5 shadow-xs">
               <span>⚡</span>
               <span>Instant OCR Scan</span>
+            </button>
+            <button onclick="openClaimModal()" class="bg-[#111418] hover:bg-black text-white text-xs font-semibold px-4 py-2 rounded-full transition shadow-xs">
+              + File Claim
             </button>
             <button onclick="shareSnapshot()" class="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200/90 text-xs font-semibold px-4 py-2 rounded-full transition shadow-2xs">
               Export Warranty Report
@@ -429,13 +452,13 @@
         <!-- 4 TOP KPI METRIC CARDS matching Reference Image 2 -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           
-          <!-- Card 1: Active Portfolio / Open Pipeline -->
-          <div class="crm-card p-5">
+          <!-- Card 1 -->
+          <div class="crm-card p-5" id="kpi-card-1">
             <div class="flex items-center justify-between">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500">ACTIVE WARRANTIES VALUE</span>
-              <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">+12.4%</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500" id="kpi1-title">ACTIVE WARRANTIES VALUE</span>
+              <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full" id="kpi1-delta">+12.4%</span>
             </div>
-            <div class="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-2" id="kpi-portfolio-value">$9,876.49</div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-2" id="kpi-portfolio-value">₹9,10,199</div>
             <div class="flex items-center justify-between mt-3 text-xs text-gray-500">
               <span id="kpi-active-count">5 active warranties</span>
               <!-- Sparkline SVG -->
@@ -445,15 +468,15 @@
             </div>
           </div>
 
-          <!-- Card 2: Claims Processed / Deals Won -->
-          <div class="crm-card p-5">
+          <!-- Card 2 -->
+          <div class="crm-card p-5" id="kpi-card-2">
             <div class="flex items-center justify-between">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500">CLAIMS RESOLVED · QTD</span>
-              <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">+8.2%</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500" id="kpi2-title">CLAIMS RESOLVED · QTD</span>
+              <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full" id="kpi2-delta">+8.2%</span>
             </div>
             <div class="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-2" id="kpi-claims-count">186</div>
             <div class="flex items-center justify-between mt-3 text-xs text-gray-500">
-              <span>of 200 target claims</span>
+              <span id="kpi2-sub">of 200 target claims</span>
               <!-- Sparkline SVG -->
               <svg class="w-20 h-6 text-blue-500" viewBox="0 0 100 30" fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="M0 20 Q 30 24, 60 12 T 100 4" stroke-linecap="round"/>
@@ -461,15 +484,15 @@
             </div>
           </div>
 
-          <!-- Card 3: Verification Rate / Win Rate -->
-          <div class="crm-card p-5">
+          <!-- Card 3 -->
+          <div class="crm-card p-5" id="kpi-card-3">
             <div class="flex items-center justify-between">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500">CLAIM APPROVAL & COVERAGE RATE</span>
-              <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">+2.1pt</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500" id="kpi3-title">CLAIM APPROVAL & COVERAGE RATE</span>
+              <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full" id="kpi3-delta">+2.1pt</span>
             </div>
-            <div class="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-2">94.6%</div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-2" id="kpi3-val">94.6%</div>
             <div class="flex items-center justify-between mt-3 text-xs text-gray-500">
-              <span>vs 92.5% last quarter</span>
+              <span id="kpi3-sub">vs 92.5% last quarter</span>
               <!-- Sparkline SVG -->
               <svg class="w-20 h-6 text-indigo-500" viewBox="0 0 100 30" fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="M0 22 Q 35 26, 65 14 T 100 8" stroke-linecap="round"/>
@@ -477,15 +500,15 @@
             </div>
           </div>
 
-          <!-- Card 4: Avg Resolution Turnaround -->
-          <div class="crm-card p-5">
+          <!-- Card 4 -->
+          <div class="crm-card p-5" id="kpi-card-4">
             <div class="flex items-center justify-between">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500">AVG REPAIR TURNAROUND</span>
-              <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">-3.4d</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500" id="kpi4-title">AVG REPAIR TURNAROUND</span>
+              <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full" id="kpi4-delta">-3.4d</span>
             </div>
-            <div class="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-2">2.1 <span class="text-base font-semibold text-gray-500">days</span></div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-2" id="kpi4-val">2.1 <span class="text-base font-semibold text-gray-500">days</span></div>
             <div class="flex items-center justify-between mt-3 text-xs text-gray-500">
-              <span>fastest: Metro Hub</span>
+              <span id="kpi4-sub">fastest: Metro Hub</span>
               <!-- Sparkline SVG -->
               <svg class="w-20 h-6 text-emerald-500" viewBox="0 0 100 30" fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="M0 8 Q 25 18, 55 12 T 100 24" stroke-linecap="round"/>
@@ -521,7 +544,7 @@
 
               <!-- Main Amount & YoY Badge -->
               <div class="mt-4 flex items-baseline gap-3">
-                <span class="text-3xl sm:text-4xl font-extrabold text-gray-900">$9.84M</span>
+                <span class="text-3xl sm:text-4xl font-extrabold text-gray-900">₹98.4 Lakhs</span>
                 <span class="bg-lime-200 text-gray-900 text-xs font-bold px-2 py-0.5 rounded-full">+18.6% YoY</span>
               </div>
 
@@ -555,7 +578,7 @@
 
                 <!-- Value tooltip over highlighted point -->
                 <div class="absolute right-28 top-8 bg-black text-white text-[11px] px-2 py-1 rounded shadow-lg pointer-events-none">
-                  Jun: $864K
+                  Jul: ₹8.64 Lakhs
                 </div>
               </div>
 
@@ -569,15 +592,15 @@
             <div class="pt-4 mt-4 border-t border-gray-100 flex flex-wrap items-center justify-between text-xs text-gray-600 gap-4">
               <div>
                 <span class="text-gray-400">Forecast:</span>
-                <span class="font-bold text-gray-900 ml-1">$9.31M</span>
+                <span class="font-bold text-gray-900 ml-1">₹93.1 Lakhs</span>
               </div>
               <div>
                 <span class="text-gray-400">Attainment:</span>
                 <span class="font-bold text-gray-900 ml-1">106%</span>
               </div>
               <div>
-                <span class="text-gray-400">Best month:</span>
-                <span class="font-bold text-gray-900 ml-1">Jul · $864K</span>
+                <span class="text-gray-400">Peak month:</span>
+                <span class="font-bold text-gray-900 ml-1">Jul · ₹8.64 Lakhs</span>
               </div>
             </div>
 
@@ -585,19 +608,19 @@
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-4">
               <div class="bg-gray-50 border border-gray-200/70 p-3 rounded-xl">
                 <div class="text-[10px] font-bold text-gray-500">Laptops & PCs</div>
-                <div class="text-sm font-extrabold text-gray-900 mt-0.5">$4.1M <span class="text-[10px] font-bold text-emerald-600">+22%</span></div>
+                <div class="text-sm font-extrabold text-gray-900 mt-0.5">₹41.0L <span class="text-[10px] font-bold text-emerald-600">+22%</span></div>
               </div>
               <div class="bg-gray-50 border border-gray-200/70 p-3 rounded-xl">
                 <div class="text-[10px] font-bold text-gray-500">Smartphones</div>
-                <div class="text-sm font-extrabold text-gray-900 mt-0.5">$3.2M <span class="text-[10px] font-bold text-emerald-600">+14%</span></div>
+                <div class="text-sm font-extrabold text-gray-900 mt-0.5">₹32.0L <span class="text-[10px] font-bold text-emerald-600">+14%</span></div>
               </div>
               <div class="bg-gray-50 border border-gray-200/70 p-3 rounded-xl">
                 <div class="text-[10px] font-bold text-gray-500">Appliances</div>
-                <div class="text-sm font-extrabold text-gray-900 mt-0.5">$1.4M <span class="text-[10px] font-bold text-red-500">-6%</span></div>
+                <div class="text-sm font-extrabold text-gray-900 mt-0.5">₹14.0L <span class="text-[10px] font-bold text-red-500">-6%</span></div>
               </div>
               <div class="bg-black text-white p-3 rounded-xl shadow-xs">
                 <div class="text-[10px] font-bold text-lime-300">Renewals & Claims</div>
-                <div class="text-sm font-extrabold text-white mt-0.5">$1.1M <span class="text-[10px] font-bold text-lime-400">+31%</span></div>
+                <div class="text-sm font-extrabold text-white mt-0.5">₹11.4L <span class="text-[10px] font-bold text-lime-400">+31%</span></div>
               </div>
             </div>
 
@@ -1083,13 +1106,13 @@
           </div>
 
           <div>
-            <label class="block font-medium text-gray-700 mb-1">Purchase Price ($ USD)</label>
-            <input type="number" step="0.01" id="reg-price" placeholder="1299.00" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+            <label class="block font-medium text-gray-700 mb-1">Purchase Price (₹ INR)</label>
+            <input type="number" step="1" id="reg-price" placeholder="49900" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
           </div>
 
           <div>
             <label class="block font-medium text-gray-700 mb-1">Retailer / Store Name</label>
-            <input type="text" id="reg-retailer" placeholder="e.g. Apple Fifth Avenue" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+            <input type="text" id="reg-retailer" placeholder="e.g. Apple BKC Mumbai / Reliance Digital" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
           </div>
 
           <div>
@@ -1266,6 +1289,71 @@
 
         <button type="submit" class="w-full bg-black text-white font-semibold rounded-xl py-2.5 hover:bg-gray-800 transition">
           Schedule Service Bay
+        </button>
+      </form>
+    </div>
+  <!-- COVERAGE RULE CONFIGURATION MODAL (WARRANTY ADMINISTRATOR) -->
+  <div id="modal-rule" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 modal-enter border border-gray-100 shadow-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <div>
+          <h3 class="text-lg font-bold text-gray-900">Configure Manufacturer Policy Rule</h3>
+          <p class="text-xs text-gray-500">Warranty Administrator sets terms for automated verification</p>
+        </div>
+        <button onclick="closeModal('modal-rule')" class="text-gray-400 hover:text-black text-lg font-bold">✕</button>
+      </div>
+
+      <form onsubmit="handleRuleSubmit(event)" class="space-y-3 text-xs">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">Manufacturer *</label>
+            <input type="text" id="rule-mfg" required placeholder="e.g. Lenovo, Asus, Dyson" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+          </div>
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">Device Category *</label>
+            <select id="rule-category" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+              <option value="Electronics">Electronics</option>
+              <option value="Laptops & Computers">Laptops & Computers</option>
+              <option value="Smartphones & Tablets">Smartphones & Tablets</option>
+              <option value="Cameras & Audio">Cameras & Audio</option>
+              <option value="Home Appliances">Home Appliances</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">Base Warranty (Months) *</label>
+            <input type="number" id="rule-months" required value="12" min="1" max="120" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+          </div>
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">Grace Period (Days)</label>
+            <input type="number" id="rule-grace" value="30" min="0" max="180" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+          </div>
+        </div>
+
+        <div class="space-y-2 py-2 border-y border-gray-100">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="rule-adh" class="rounded text-black focus:ring-black">
+            <span class="text-gray-700 font-medium">Covers Accidental Damage & Handling (ADH Protection)</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="rule-invoice-req" checked class="rounded text-black focus:ring-black">
+            <span class="text-gray-700 font-medium">Requires Valid Original Purchase Invoice / Tax Receipt</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="rule-extended" checked class="rounded text-black focus:ring-black">
+            <span class="text-gray-700 font-medium">Eligible for Extended Care / Extended Warranty Plans</span>
+          </label>
+        </div>
+
+        <div>
+          <label class="block font-medium text-gray-700 mb-1">Coverage Terms Summary *</label>
+          <textarea id="rule-terms" required rows="2" placeholder="e.g. 1-year limited hardware warranty covering manufacturing defects and internal components." class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black"></textarea>
+        </div>
+
+        <button type="submit" class="w-full bg-black text-white font-semibold rounded-xl py-2.5 hover:bg-gray-800 transition">
+          Save Coverage Rule
         </button>
       </form>
     </div>
