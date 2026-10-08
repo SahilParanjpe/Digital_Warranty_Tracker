@@ -1,0 +1,172 @@
+/* Digital Warranty Tracker - Custom Stylesheet */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+:root {
+  --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-heading: 'Plus Jakarta Sans', sans-serif;
+  --bg-app: #f4f5f6;
+  --bg-card: #ffffff;
+  --border-light: #e5e7eb;
+  --accent-lime: #d4f870;
+  --accent-lime-hover: #c4ec58;
+  --dark-pill: #111418;
+  --dark-pill-hover: #1f242b;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-app);
+  color: #111827;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Subtle pastel mesh gradient for Hero section matching Reference Image 1 */
+.hero-gradient-mesh {
+  background-color: #fafbfc;
+  background-image: 
+    radial-gradient(at 15% 20%, rgba(207, 237, 255, 0.65) 0px, transparent 55%),
+    radial-gradient(at 85% 25%, rgba(254, 243, 199, 0.70) 0px, transparent 50%),
+    radial-gradient(at 50% 60%, rgba(243, 244, 246, 0.3) 0px, transparent 60%);
+  background-repeat: no-repeat;
+}
+
+/* Subtle dashboard ambient glow matching Reference Image 2 */
+.dashboard-ambient-bg {
+  background-color: #eceee9;
+  background-image: 
+    radial-gradient(at 90% 10%, rgba(236, 247, 222, 0.7) 0px, transparent 40%),
+    radial-gradient(at 10% 90%, rgba(240, 243, 245, 0.8) 0px, transparent 50%);
+}
+
+/* Card aesthetics */
+.crm-card {
+  background: #ffffff;
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  border-radius: 20px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.crm-card:hover {
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.04);
+}
+
+/* Lime pill button like Reference Image 2 ("Log activity") */
+.btn-lime {
+  background-color: var(--accent-lime);
+  color: #111827;
+  font-weight: 600;
+  border-radius: 9999px;
+  padding: 8px 18px;
+  transition: all 0.2s ease;
+}
+.btn-lime:hover {
+  background-color: var(--accent-lime-hover);
+  transform: translateY(-1px);
+}
+
+/* Dark pill button */
+.btn-dark {
+  background-color: var(--dark-pill);
+  color: #ffffff;
+  font-weight: 500;
+  border-radius: 9999px;
+  padding: 8px 18px;
+  transition: all 0.2s ease;
+}
+.btn-dark:hover {
+  background-color: var(--dark-pill-hover);
+  transform: translateY(-1px);
+}
+
+/* Custom badge pills */
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.badge-active {
+  background-color: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+.badge-expiring {
+  background-color: #fffbeb;
+  color: #d97706;
+  border: 1px solid #fde68a;
+}
+.badge-expired {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+.badge-verified {
+  background-color: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+
+/* Pipeline Status Stepper */
+.pipeline-step {
+  position: relative;
+  flex: 1;
+  text-align: center;
+}
+.pipeline-step::after {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background-color: #e5e7eb;
+  z-index: 1;
+}
+.pipeline-step:last-child::after {
+  display: none;
+}
+.pipeline-step.completed::after {
+  background-color: #10b981;
+}
+.pipeline-step.active::after {
+  background-color: #3b82f6;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Modal animation */
+.modal-enter {
+  animation: modalFadeIn 0.2s ease-out forwards;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+

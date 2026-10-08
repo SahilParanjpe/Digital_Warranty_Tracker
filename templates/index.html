@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Warranty Tracker - Intelligent Warranty & Service OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['monospace']
+          },
+          colors: {
+            lime: {
+              300: '#d9f99d',
+              400: '#ccf381',
+              500: '#bef264'
+            },
+            darkpill: '#111418'
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="bg-[#f4f5f6] text-[#111827] antialiased min-h-screen">
+
+  <!-- TOP ROLE BAR (SWITCH BETWEEN ALL 4 USER ROLES INSTANTLY) -->
+  <div class="bg-[#090a0f] text-white text-xs px-4 py-2 border-b border-gray-800 flex flex-wrap items-center justify-between gap-2 sticky top-0 z-50">
+    <div class="flex items-center gap-3">
+      <span class="inline-flex items-center gap-1.5 font-semibold text-[#bef264] tracking-wide">
+        <span class="w-2 h-2 rounded-full bg-[#bef264] animate-pulse"></span>
+        DIGITAL WARRANTY TRACKER
+      </span>
+      <span class="text-gray-400 hidden sm:inline">|</span>
+      <span class="text-gray-300 hidden md:inline">SQLite Database Active</span>
+      <span class="bg-gray-800 text-gray-300 px-2 py-0.5 rounded text-[11px] font-mono">warranty_tracker.db</span>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <span class="text-gray-400 text-[11px] hidden lg:inline">Active Role View:</span>
+      <div class="inline-flex bg-gray-900 p-0.5 rounded-lg border border-gray-700 text-[11px]">
+        <button onclick="switchRole('product_owner')" id="role-btn-owner" class="px-2.5 py-1 rounded-md font-medium transition-all text-white bg-blue-600">
+          👤 Product Owner
+        </button>
+        <button onclick="switchRole('service_center_staff')" id="role-btn-staff" class="px-2.5 py-1 rounded-md font-medium transition-all text-gray-400 hover:text-white">
+          🏢 Service Staff
+        </button>
+        <button onclick="switchRole('service_technician')" id="role-btn-tech" class="px-2.5 py-1 rounded-md font-medium transition-all text-gray-400 hover:text-white">
+          🔧 Technician
+        </button>
+        <button onclick="switchRole('warranty_admin')" id="role-btn-admin" class="px-2.5 py-1 rounded-md font-medium transition-all text-gray-400 hover:text-white">
+          🛡️ Admin
+        </button>
+      </div>
+
+      <div class="h-4 w-[1px] bg-gray-700 mx-1 hidden sm:block"></div>
+      
+      <button onclick="showView('hero')" class="px-2.5 py-1 rounded text-gray-300 hover:text-white hover:bg-gray-800 text-[11px] transition">
+        Landing Hero
+      </button>
+      <button onclick="showView('dashboard')" class="px-2.5 py-1 rounded text-[#bef264] hover:bg-gray-800 text-[11px] font-semibold transition">
+        Dashboard View
+      </button>
+      <button onclick="openAuthModal('signin')" class="px-2.5 py-1 rounded bg-white text-gray-900 font-semibold text-[11px] hover:bg-gray-200 transition">
+        Login / Sign Up
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 1. HERO SECTION (MATCHING REFERENCE IMAGE 1 - SHADCNS PACE STYLE)       -->
+  <!-- ========================================================================= -->
+  <section id="view-hero" class="min-h-screen hero-gradient-mesh flex flex-col justify-between transition-all duration-300">
+    
+    <!-- Floating Navigation Bar matching Reference Image 1 -->
+    <header class="w-full pt-6 px-4 md:px-12 flex justify-center">
+      <div class="w-full max-w-6xl flex items-center justify-between">
+        <!-- Logo Left (DWT) -->
+        <div class="flex items-center gap-2.5 cursor-pointer" onclick="showView('hero')">
+          <div class="w-7 h-7 rounded-lg bg-black text-white flex items-center justify-center font-extrabold text-xs shadow-xs tracking-wider">
+            DWT
+          </div>
+          <div class="flex items-baseline gap-1">
+            <span class="text-xl font-bold tracking-tight text-gray-900">DWT</span>
+            <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">Tracker</span>
+          </div>
+        </div>
+
+        <!-- Floating Navbar Pill Center -->
+        <nav class="hidden md:flex items-center bg-white/80 backdrop-blur-md px-5 py-2 rounded-full border border-gray-200/80 shadow-sm text-xs font-semibold text-gray-700 gap-5">
+          <button onclick="setDashboardTab('products')" class="hover:text-black transition">My Products</button>
+          <button onclick="openOcrModal()" class="hover:text-black transition flex items-center gap-1">
+            <span>OCR Scanner</span>
+            <span class="bg-[#ccf381] text-gray-900 text-[9px] px-1 py-0.2 rounded font-bold">AI</span>
+          </button>
+          <button onclick="openVerifyModal()" class="hover:text-black transition">Verification</button>
+          <button onclick="setDashboardTab('claims')" class="hover:text-black transition">Claims</button>
+          <button onclick="setDashboardTab('service')" class="hover:text-black transition">Service Bay</button>
+          <button onclick="setDashboardTab('rules')" class="hover:text-black transition">Coverage Rules</button>
+        </nav>
+
+        <!-- Right Pill Button -->
+        <div class="flex items-center gap-3">
+          <button onclick="showView('dashboard')" class="inline-flex items-center gap-2 bg-[#111418] hover:bg-[#20252d] text-white text-xs font-semibold px-5 py-2.5 rounded-full transition shadow-sm">
+            <span>Open Dashboard</span>
+            <span class="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-[10px]">↗</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Hero Content -->
+    <main class="flex-1 flex flex-col items-center justify-center text-center px-4 py-16 md:py-24 max-w-5xl mx-auto">
+      
+      <!-- Tag badge -->
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/80 backdrop-blur border border-gray-200 text-xs font-semibold text-gray-700 mb-6 shadow-xs">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        Digital Warranty Tracker & Service Hub · SQLite Database Live
+      </div>
+
+      <!-- Main Headline: Relevant to Digital Warranty Tracker -->
+      <h1 class="text-4xl sm:text-6xl md:text-7xl font-extrabold text-[#111827] tracking-tight leading-[1.08] max-w-4xl">
+        Intelligent warranty tracking<br>
+        <span class="text-gray-900">with effortless claims</span>
+      </h1>
+
+      <!-- Subtitle: Relevant to Digital Warranty Tracker & 4 User Roles -->
+      <p class="mt-6 text-base sm:text-lg text-gray-600 max-w-2xl leading-relaxed font-normal">
+        At DWT, we empower product owners, service centers, technicians, and administrators to streamline the entire warranty lifecycle — from automated invoice OCR and coverage verification to real-time service requests and seamless claim resolution.
+      </p>
+
+      <!-- Action Buttons & Avatar Rating Social Proof -->
+      <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6">
+        <!-- Get Started Pill with Arrow -->
+        <button onclick="showView('dashboard')" class="inline-flex items-center gap-3 bg-[#111418] hover:bg-[#222831] text-white font-medium text-sm px-6 py-3.5 rounded-full transition-all shadow-md group">
+          <span>Get Started Now</span>
+          <span class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-xs group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">↗</span>
+        </button>
+
+        <!-- User Avatars + 5 Golden Stars -->
+        <div class="flex items-center gap-3">
+          <div class="flex -space-x-2">
+            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&q=80" alt="User">
+            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=80&q=80" alt="User">
+            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=80&q=80" alt="User">
+            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=80&q=80" alt="User">
+          </div>
+          <div class="text-left">
+            <div class="flex text-amber-500 text-xs">
+              ★ ★ ★ ★ ★
+            </div>
+            <p class="text-xs text-gray-600 font-medium">Trusted by 10,000+ owners & service hubs</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Feature Highlights -->
+      <div class="mt-14 grid grid-cols-2 sm:grid-cols-4 gap-4 w-full max-w-4xl text-left">
+        <div class="p-4 rounded-2xl bg-white/60 backdrop-blur border border-gray-200/80">
+          <div class="text-xl mb-1">📄</div>
+          <div class="text-xs font-bold text-gray-900">Invoice OCR Scanner</div>
+          <p class="text-[11px] text-gray-500">Auto-extract store, date, price & serial with manual correction</p>
+        </div>
+        <div class="p-4 rounded-2xl bg-white/60 backdrop-blur border border-gray-200/80">
+          <div class="text-xl mb-1">🛡️</div>
+          <div class="text-xs font-bold text-gray-900">Coverage Verification</div>
+          <p class="text-[11px] text-gray-500">Check eligibility and terms against manufacturer register</p>
+        </div>
+        <div class="p-4 rounded-2xl bg-white/60 backdrop-blur border border-gray-200/80">
+          <div class="text-xl mb-1">⚡</div>
+          <div class="text-xs font-bold text-gray-900">5-Stage Claim Tracker</div>
+          <p class="text-[11px] text-gray-500">Draft → Submitted → Review → Scheduled → Resolved</p>
+        </div>
+        <div class="p-4 rounded-2xl bg-white/60 backdrop-blur border border-gray-200/80">
+          <div class="text-xl mb-1">🔔</div>
+          <div class="text-xs font-bold text-gray-900">Smart Expiry Alerts</div>
+          <p class="text-[11px] text-gray-500">Automated email & push notifications before warranties end</p>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Social Proof Brand Logos Bar: Relevant Manufacturer Ecosystem -->
+    <footer class="w-full pb-10 pt-4 px-4 text-center">
+      <div class="max-w-5xl mx-auto border-t border-gray-200/60 pt-8">
+        <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-8">
+          Supported & Verified Across Leading Hardware & Appliance Brands
+        </p>
+
+        <!-- Brand Row for major consumer hardware brands -->
+        <div class="flex flex-wrap items-center justify-center gap-8 sm:gap-12 md:gap-14 opacity-85 text-gray-800">
+          <div class="flex items-center gap-2 font-bold text-sm tracking-wide">
+            <span class="text-base">🍎</span>
+            <span>Apple</span>
+          </div>
+          <div class="flex items-center gap-2 font-bold text-sm tracking-wide">
+            <span class="text-base">📱</span>
+            <span>Samsung</span>
+          </div>
+          <div class="flex items-center gap-2 font-bold text-sm tracking-wide">
+            <span class="text-base">📷</span>
+            <span>Sony</span>
+          </div>
+          <div class="flex items-center gap-2 font-bold text-sm tracking-wide">
+            <span class="text-base">💻</span>
+            <span>Dell</span>
+          </div>
+          <div class="flex items-center gap-2 font-bold text-sm tracking-wide">
+            <span class="text-base">🌀</span>
+            <span>Dyson</span>
+          </div>
+          <div class="flex items-center gap-2 font-bold text-sm tracking-wide">
+            <span class="text-base">📺</span>
+            <span>LG Electronics</span>
+          </div>
+          <div class="flex items-center gap-2 font-bold text-sm tracking-wide">
+            <span class="text-base">⚡</span>
+            <span>Bosch</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 2. DASHBOARD VIEW (MATCHING REFERENCE IMAGE 2 - BOND CRM AESTHETICS)     -->
+  <!-- ========================================================================= -->
+  <div id="view-dashboard" class="hidden min-h-screen dashboard-ambient-bg flex flex-col md:flex-row">
+    
+    <!-- LEFT SIDEBAR matching Reference Image 2 -->
+    <aside class="w-full md:w-64 bg-white md:min-h-screen border-r border-gray-200/80 flex flex-col justify-between p-4 shrink-0">
+      <div>
+        <!-- Top Logo -->
+        <div class="flex items-center gap-3 px-2 py-3 mb-4 cursor-pointer" onclick="showView('hero')">
+          <div class="w-8 h-8 rounded-xl bg-black text-white font-extrabold flex items-center justify-center text-xs shadow-xs tracking-wider">
+            DWT
+          </div>
+          <div>
+            <div class="font-bold text-sm text-gray-900 leading-tight">DWT Tracker</div>
+            <div class="text-[10px] text-gray-400 font-medium">Digital Warranty Platform</div>
+          </div>
+        </div>
+
+        <!-- Search Bar with Keyboard Shortcut Badge -->
+        <div class="relative mb-6">
+          <input type="text" id="sidebar-search" oninput="handleSearch(this.value)" placeholder="Search everything" class="w-full bg-[#f4f5f6] border border-transparent focus:border-gray-300 focus:bg-white text-xs rounded-xl py-2 pl-8 pr-10 outline-none transition">
+          <span class="absolute left-2.5 top-2.5 text-gray-400 text-xs">🔍</span>
+          <span class="absolute right-2.5 top-2 bg-gray-200/80 text-gray-500 text-[10px] px-1.5 py-0.5 rounded font-mono">⌘K</span>
+        </div>
+
+        <!-- Nav Sections -->
+        <div class="space-y-6">
+          <!-- WORKSPACE -->
+          <div>
+            <div class="text-[10px] uppercase font-bold text-gray-400 tracking-wider px-2 mb-2">Workspace</div>
+            <nav class="space-y-1 text-xs">
+              <button onclick="setDashboardTab('overview')" id="tab-btn-overview" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-medium bg-[#111418] text-white transition">
+                <div class="flex items-center gap-2.5">
+                  <span>📊</span>
+                  <span>Overview</span>
+                </div>
+              </button>
+
+              <button onclick="openRemindersDrawer()" class="w-full flex items-center justify-between px-3 py-2 rounded-xl font-medium text-gray-600 hover:bg-gray-100 transition">
+                <div class="flex items-center gap-2.5">
+                  <span>🔔</span>
+                  <span>Notifications</span>
+                </div>
+                <span class="bg-gray-200 text-gray-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full" id="unread-reminders-badge">4</span>
+              </button>
+            </nav>
+          </div>
+
+          <!-- RECORDS -->
+          <div>
+            <div class="text-[10px] uppercase font-bold text-gray-400 tracking-wider px-2 mb-2">Records & Warranty</div>
+            <nav class="space-y-1 text-xs">
+              <button onclick="setDashboardTab('products')" id="tab-btn-products" class="w-full flex items-center justify-between px-3 py-2 rounded-xl font-medium text-gray-600 hover:bg-gray-100 transition">
+                <div class="flex items-center gap-2.5">
+                  <span>💻</span>
+                  <span>My Products</span>
+                </div>
+                <span class="text-gray-400 text-[11px]" id="count-products-badge">6</span>
+              </button>
+
+              <button onclick="setDashboardTab('claims')" id="tab-btn-claims" class="w-full flex items-center justify-between px-3 py-2 rounded-xl font-medium text-gray-600 hover:bg-gray-100 transition">
+                <div class="flex items-center gap-2.5">
+                  <span>📝</span>
+                  <span>Claims Pipeline</span>
+                </div>
+                <span class="text-amber-600 text-[11px] font-semibold" id="count-claims-badge">3</span>
+              </button>
+
+              <button onclick="setDashboardTab('service')" id="tab-btn-service" class="w-full flex items-center justify-between px-3 py-2 rounded-xl font-medium text-gray-600 hover:bg-gray-100 transition">
+                <div class="flex items-center gap-2.5">
+                  <span>🛠️</span>
+                  <span>Service Bay Queue</span>
+                </div>
+                <span class="text-blue-600 text-[11px] font-semibold" id="count-service-badge">4</span>
+              </button>
+
+              <button onclick="setDashboardTab('rules')" id="tab-btn-rules" class="w-full flex items-center justify-between px-3 py-2 rounded-xl font-medium text-gray-600 hover:bg-gray-100 transition">
+                <div class="flex items-center gap-2.5">
+                  <span>📜</span>
+                  <span>Coverage Rules</span>
+                </div>
+              </button>
+            </nav>
+          </div>
+
+          <!-- INTELLIGENCE -->
+          <div>
+            <div class="text-[10px] uppercase font-bold text-gray-400 tracking-wider px-2 mb-2">Verification & Tools</div>
+            <nav class="space-y-1 text-xs">
+              <button onclick="openVerifyModal()" class="w-full flex items-center justify-between px-3 py-2 rounded-xl font-medium text-gray-600 hover:bg-gray-100 transition">
+                <div class="flex items-center gap-2.5">
+                  <span>🔍</span>
+                  <span>Verify Serial Number</span>
+                </div>
+              </button>
+
+              <button onclick="openOcrModal()" class="w-full flex items-center justify-between px-3 py-2 rounded-xl font-medium text-gray-600 hover:bg-gray-100 transition">
+                <div class="flex items-center gap-2.5">
+                  <span>📸</span>
+                  <span>OCR Invoice Scanner</span>
+                </div>
+                <span class="bg-[#bef264] text-gray-900 text-[9px] font-bold px-1.5 py-0.5 rounded">NEW</span>
+              </button>
+            </nav>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom User Profile Pill matching Reference Image 2 -->
+      <div class="pt-4 border-t border-gray-100">
+        <div class="flex items-center justify-between p-2 rounded-xl bg-gray-50 border border-gray-200/60">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center text-xs" id="user-avatar-initials">
+              AV
+            </div>
+            <div class="leading-tight">
+              <div class="font-bold text-xs text-gray-900" id="current-user-name">Alex Vance</div>
+              <div class="text-[10px] text-gray-500 font-medium capitalize" id="current-user-role-label">Product Owner</div>
+            </div>
+          </div>
+          <button onclick="openAuthModal('signin')" title="Switch User / Logout" class="text-gray-400 hover:text-gray-700 text-xs p-1">
+            ⚙️
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN DASHBOARD CONTENT AREA -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+      
+      <!-- Top Bar matching Reference Image 2 -->
+      <header class="bg-white/80 backdrop-blur-md border-b border-gray-200/80 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-20">
+        <!-- Breadcrumbs -->
+        <div class="flex items-center gap-2 text-xs text-gray-500">
+          <span class="hover:text-gray-800 cursor-pointer" onclick="showView('hero')">DWT Hub</span>
+          <span>/</span>
+          <span class="font-semibold text-gray-900" id="top-breadcrumb">Overview</span>
+        </div>
+
+        <!-- Period Toggle Pill + Actions matching Reference Image 2 -->
+        <div class="flex items-center gap-3">
+          <!-- Month | Quarter | Year Toggle Pill -->
+          <div class="inline-flex bg-[#f4f5f6] p-1 rounded-full text-xs font-medium text-gray-600">
+            <button onclick="setTimeRange('month')" id="btn-range-month" class="px-3 py-1 rounded-full transition">Month</button>
+            <button onclick="setTimeRange('quarter')" id="btn-range-quarter" class="px-3 py-1 rounded-full bg-black text-white font-semibold transition">Quarter</button>
+            <button onclick="setTimeRange('year')" id="btn-range-year" class="px-3 py-1 rounded-full transition">Year</button>
+          </div>
+
+          <!-- Alerts 7 Pill -->
+          <button onclick="openRemindersDrawer()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-200 bg-white hover:bg-gray-50 text-xs font-medium text-gray-700 shadow-2xs">
+            <span>🔔 Alerts</span>
+            <span class="bg-amber-100 text-amber-700 text-[10px] font-bold px-1.5 rounded-full">7</span>
+          </button>
+
+          <!-- + Create Black Pill -->
+          <button onclick="openRegisterProductModal()" class="inline-flex items-center gap-1.5 bg-[#111418] hover:bg-black text-white text-xs font-semibold px-4 py-2 rounded-full transition shadow-xs">
+            <span>+</span>
+            <span>Register Product</span>
+          </button>
+
+          <!-- User Profile Avatar Pill -->
+          <img id="top-user-avatar" class="w-8 h-8 rounded-full ring-2 ring-gray-100 object-cover cursor-pointer" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&q=80" alt="Profile" onclick="openAuthModal('signin')">
+        </div>
+      </header>
+
+      <!-- Dashboard Body -->
+      <div class="p-6 md:p-8 space-y-6">
+
+        <!-- GREETING BANNER matching Reference Image 2 -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="text-[11px] font-bold uppercase tracking-wider text-gray-500">
+              SATURDAY · 25 JULY 2026
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight mt-0.5">
+              Good morning, <span id="greeting-name">Alex</span>
+            </h1>
+            <p class="text-xs sm:text-sm text-gray-600 mt-1">
+              You have <strong class="text-gray-900 font-bold" id="banner-expiring-count">1 warranty</strong> expiring this week and <strong class="text-gray-900 font-bold" id="banner-queue-count">2 service requests</strong> queued.
+            </p>
+          </div>
+
+          <!-- Right Action Pill Buttons matching Reference Image 2 ("Log activity", "Share snapshot") -->
+          <div class="flex items-center gap-2.5">
+            <button onclick="openOcrModal()" class="btn-lime text-xs font-bold inline-flex items-center gap-1.5 shadow-xs">
+              <span>⚡</span>
+              <span>Instant OCR Scan</span>
+            </button>
+            <button onclick="shareSnapshot()" class="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200/90 text-xs font-semibold px-4 py-2 rounded-full transition shadow-2xs">
+              Export Warranty Report
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 TOP KPI METRIC CARDS matching Reference Image 2 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <!-- Card 1: Active Portfolio / Open Pipeline -->
+          <div class="crm-card p-5">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500">ACTIVE WARRANTIES VALUE</span>
+              <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">+12.4%</span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-2" id="kpi-portfolio-value">$9,876.49</div>
+            <div class="flex items-center justify-between mt-3 text-xs text-gray-500">
+              <span id="kpi-active-count">5 active warranties</span>
+              <!-- Sparkline SVG -->
+              <svg class="w-20 h-6 text-emerald-500" viewBox="0 0 100 30" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M0 25 Q 25 10, 50 18 T 100 5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Card 2: Claims Processed / Deals Won -->
+          <div class="crm-card p-5">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500">CLAIMS RESOLVED · QTD</span>
+              <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">+8.2%</span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-2" id="kpi-claims-count">186</div>
+            <div class="flex items-center justify-between mt-3 text-xs text-gray-500">
+              <span>of 200 target claims</span>
+              <!-- Sparkline SVG -->
+              <svg class="w-20 h-6 text-blue-500" viewBox="0 0 100 30" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M0 20 Q 30 24, 60 12 T 100 4" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Card 3: Verification Rate / Win Rate -->
+          <div class="crm-card p-5">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500">CLAIM APPROVAL & COVERAGE RATE</span>
+              <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">+2.1pt</span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-2">94.6%</div>
+            <div class="flex items-center justify-between mt-3 text-xs text-gray-500">
+              <span>vs 92.5% last quarter</span>
+              <!-- Sparkline SVG -->
+              <svg class="w-20 h-6 text-indigo-500" viewBox="0 0 100 30" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M0 22 Q 35 26, 65 14 T 100 8" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Card 4: Avg Resolution Turnaround -->
+          <div class="crm-card p-5">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500">AVG REPAIR TURNAROUND</span>
+              <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">-3.4d</span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-2">2.1 <span class="text-base font-semibold text-gray-500">days</span></div>
+            <div class="flex items-center justify-between mt-3 text-xs text-gray-500">
+              <span>fastest: Metro Hub</span>
+              <!-- Sparkline SVG -->
+              <svg class="w-20 h-6 text-emerald-500" viewBox="0 0 100 30" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M0 8 Q 25 18, 55 12 T 100 24" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- MAIN CHART & TODAY'S SCHEDULE GRID matching Reference Image 2 -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <!-- LEFT 2 COLS: REVENUE VS FORECAST / WARRANTY COVERAGE CHART -->
+          <div class="lg:col-span-2 crm-card p-6 flex flex-col justify-between">
+            <div>
+              <div class="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <div class="font-bold text-sm text-gray-900">Protected Warranty Value & Claims Coverage</div>
+                  <div class="text-xs text-gray-500">Cumulative warranty portfolio value, rolling 12 months</div>
+                </div>
+                <!-- Legend -->
+                <div class="flex items-center gap-4 text-xs text-gray-600">
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-3 h-0.5 bg-black"></span>
+                    <span>Actual</span>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-3 h-0.5 bg-emerald-500 border-dashed border-t-2"></span>
+                    <span>Forecast</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Main Amount & YoY Badge -->
+              <div class="mt-4 flex items-baseline gap-3">
+                <span class="text-3xl sm:text-4xl font-extrabold text-gray-900">$9.84M</span>
+                <span class="bg-lime-200 text-gray-900 text-xs font-bold px-2 py-0.5 rounded-full">+18.6% YoY</span>
+              </div>
+
+              <!-- Interactive Curved Chart Graphic matching Reference Image 2 -->
+              <div class="relative w-full h-56 mt-4">
+                <svg class="w-full h-full overflow-visible" viewBox="0 0 700 200" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stop-color="#ccf381" stop-opacity="0.6"/>
+                      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.0"/>
+                    </linearGradient>
+                  </defs>
+                  
+                  <!-- Grid horizontal lines -->
+                  <line x1="0" y1="40" x2="700" y2="40" stroke="#f1f5f9" stroke-width="1"/>
+                  <line x1="0" y1="90" x2="700" y2="90" stroke="#f1f5f9" stroke-width="1"/>
+                  <line x1="0" y1="140" x2="700" y2="140" stroke="#f1f5f9" stroke-width="1"/>
+
+                  <!-- Area fill under actual line -->
+                  <path d="M 0 170 Q 150 160, 300 135 T 550 65 L 700 35 L 700 200 L 0 200 Z" fill="url(#chartGradient)"/>
+
+                  <!-- Dashed forecast line -->
+                  <path d="M 450 90 Q 550 60, 700 20" fill="none" stroke="#10b981" stroke-width="2" stroke-dasharray="4,4"/>
+
+                  <!-- Main solid actual curve line -->
+                  <path d="M 0 170 Q 150 160, 300 135 T 550 65 L 700 35" fill="none" stroke="#111827" stroke-width="3" stroke-linecap="round"/>
+
+                  <!-- Interactive highlighted point -->
+                  <circle cx="550" cy="65" r="5" fill="#111827" stroke="#ffffff" stroke-width="2.5"/>
+                </svg>
+
+                <!-- Value tooltip over highlighted point -->
+                <div class="absolute right-28 top-8 bg-black text-white text-[11px] px-2 py-1 rounded shadow-lg pointer-events-none">
+                  Jun: $864K
+                </div>
+              </div>
+
+              <!-- Month X-Axis -->
+              <div class="flex justify-between text-[10px] font-bold text-gray-400 uppercase mt-2 px-1">
+                <span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span>
+              </div>
+            </div>
+
+            <!-- Stats Bar matching Reference Image 2 -->
+            <div class="pt-4 mt-4 border-t border-gray-100 flex flex-wrap items-center justify-between text-xs text-gray-600 gap-4">
+              <div>
+                <span class="text-gray-400">Forecast:</span>
+                <span class="font-bold text-gray-900 ml-1">$9.31M</span>
+              </div>
+              <div>
+                <span class="text-gray-400">Attainment:</span>
+                <span class="font-bold text-gray-900 ml-1">106%</span>
+              </div>
+              <div>
+                <span class="text-gray-400">Best month:</span>
+                <span class="font-bold text-gray-900 ml-1">Jul · $864K</span>
+              </div>
+            </div>
+
+            <!-- Category Breakdown Pills matching Reference Image 2 -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-4">
+              <div class="bg-gray-50 border border-gray-200/70 p-3 rounded-xl">
+                <div class="text-[10px] font-bold text-gray-500">Laptops & PCs</div>
+                <div class="text-sm font-extrabold text-gray-900 mt-0.5">$4.1M <span class="text-[10px] font-bold text-emerald-600">+22%</span></div>
+              </div>
+              <div class="bg-gray-50 border border-gray-200/70 p-3 rounded-xl">
+                <div class="text-[10px] font-bold text-gray-500">Smartphones</div>
+                <div class="text-sm font-extrabold text-gray-900 mt-0.5">$3.2M <span class="text-[10px] font-bold text-emerald-600">+14%</span></div>
+              </div>
+              <div class="bg-gray-50 border border-gray-200/70 p-3 rounded-xl">
+                <div class="text-[10px] font-bold text-gray-500">Appliances</div>
+                <div class="text-sm font-extrabold text-gray-900 mt-0.5">$1.4M <span class="text-[10px] font-bold text-red-500">-6%</span></div>
+              </div>
+              <div class="bg-black text-white p-3 rounded-xl shadow-xs">
+                <div class="text-[10px] font-bold text-lime-300">Renewals & Claims</div>
+                <div class="text-sm font-extrabold text-white mt-0.5">$1.1M <span class="text-[10px] font-bold text-lime-400">+31%</span></div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- RIGHT COL: TODAY'S SCHEDULE & SERVICE QUEUE matching Reference Image 2 -->
+          <div class="crm-card p-6 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <div class="font-bold text-sm text-gray-900">Today's schedule</div>
+                <button onclick="setDashboardTab('service')" class="text-xs text-gray-500 hover:text-black font-medium">Calendar ↗</button>
+              </div>
+
+              <!-- Scheduled List Cards matching Reference Image 2 -->
+              <div class="space-y-3" id="schedule-cards-list">
+                
+                <!-- Item 1: Display repair -->
+                <div class="p-3.5 rounded-2xl bg-gray-50 border border-gray-200/80 hover:bg-white hover:shadow-xs transition">
+                  <div class="flex items-center justify-between text-xs mb-1.5">
+                    <span class="font-mono text-gray-500 text-[11px]">09:30 – 11:30</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">Scheduled</span>
+                  </div>
+                  <div class="font-bold text-xs text-gray-900">MacBook Pro Display Replacement</div>
+                  <div class="flex items-center gap-2 mt-2">
+                    <img class="w-5 h-5 rounded-full object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=60&q=80" alt="Tech">
+                    <span class="text-[11px] text-gray-600">David Miller · Tech Bay 1</span>
+                  </div>
+                </div>
+
+                <!-- Item 2: Camera Diagnosis -->
+                <div class="p-3.5 rounded-2xl bg-[#f7fee7] border border-[#d9f99d] transition">
+                  <div class="flex items-center justify-between text-xs mb-1.5">
+                    <span class="font-mono text-gray-500 text-[11px]">11:15 – 12:45</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-lime-200 text-lime-800">Under Review</span>
+                  </div>
+                  <div class="font-bold text-xs text-gray-900">Sony A7 IV Shutter Mechanism</div>
+                  <div class="flex items-center gap-2 mt-2">
+                    <img class="w-5 h-5 rounded-full object-cover" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=60&q=80" alt="Staff">
+                    <span class="text-[11px] text-gray-600">Sarah Connor · Inspection</span>
+                  </div>
+                </div>
+
+                <!-- Item 3: Samsung Port -->
+                <div class="p-3.5 rounded-2xl bg-gray-50 border border-gray-200/80 hover:bg-white transition">
+                  <div class="flex items-center justify-between text-xs mb-1.5">
+                    <span class="font-mono text-gray-500 text-[11px]">14:00 – 14:45</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">Discovery</span>
+                  </div>
+                  <div class="font-bold text-xs text-gray-900">Galaxy S25 Type-C Port Check</div>
+                  <div class="flex items-center gap-2 mt-2">
+                    <div class="w-5 h-5 rounded-full bg-purple-200 text-purple-800 font-bold flex items-center justify-center text-[10px]">LB</div>
+                    <span class="text-[11px] text-gray-600">Lucas Bennett · Diagnostics</span>
+                  </div>
+                </div>
+
+                <!-- Item 4: Renewal review -->
+                <div class="p-3.5 rounded-2xl bg-gray-50 border border-gray-200/80 hover:bg-white transition">
+                  <div class="flex items-center justify-between text-xs mb-1.5">
+                    <span class="font-mono text-gray-500 text-[11px]">16:30 – 17:00</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Renewal</span>
+                  </div>
+                  <div class="font-bold text-xs text-gray-900">Dell UltraSharp Coverage Option</div>
+                  <div class="flex items-center gap-2 mt-2">
+                    <div class="w-5 h-5 rounded-full bg-emerald-200 text-emerald-800 font-bold flex items-center justify-center text-[10px]">AK</div>
+                    <span class="text-[11px] text-gray-600">Andre Kowalski · Warranty Desk</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Focus Time indicator matching Reference Image 2 -->
+            <div class="pt-4 mt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
+              <span>3h 20m of active queue</span>
+              <span class="font-semibold text-gray-900">82% focus time</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- LIFECYCLE PIPELINE HEALTH & ACTIVITY STREAM matching Reference Image 2 -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <!-- LEFT 1 COL: WARRANTY PIPELINE HEALTH -->
+          <div class="crm-card p-6">
+            <div class="font-bold text-sm text-gray-900 mb-1">Warranty Lifecycle Pipeline</div>
+            <div class="text-xs text-gray-500 mb-4">Claims & Service progression stages</div>
+
+            <!-- Stages progression bars -->
+            <div class="space-y-3 text-xs">
+              <div>
+                <div class="flex justify-between font-medium mb-1">
+                  <span>1. Draft / Submitted</span>
+                  <span class="font-bold text-gray-900">100%</span>
+                </div>
+                <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                  <div class="bg-blue-500 h-full w-full rounded-full"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between font-medium mb-1">
+                  <span>2. Under Administrator Review</span>
+                  <span class="font-bold text-gray-900">84%</span>
+                </div>
+                <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                  <div class="bg-amber-500 h-full w-[84%] rounded-full"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between font-medium mb-1">
+                  <span>3. Service Bay Scheduled</span>
+                  <span class="font-bold text-gray-900">62%</span>
+                </div>
+                <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                  <div class="bg-indigo-500 h-full w-[62%] rounded-full"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between font-medium mb-1">
+                  <span>4. Resolved & Reimbursed</span>
+                  <span class="font-bold text-gray-900">48%</span>
+                </div>
+                <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                  <div class="bg-emerald-500 h-full w-[48%] rounded-full"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between text-xs">
+              <span class="text-gray-500">Pipeline conversion:</span>
+              <span class="font-bold text-emerald-600">+14.2% vs benchmark</span>
+            </div>
+          </div>
+
+          <!-- RIGHT 2 COLS: ACTIVITY STREAM matching Reference Image 2 -->
+          <div class="lg:col-span-2 crm-card p-6">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <div class="font-bold text-sm text-gray-900">Activity stream</div>
+                <div class="text-xs text-gray-500">Audit trail of actions across SQLite database</div>
+              </div>
+              <span class="text-xs text-gray-400">Click a row to expand</span>
+            </div>
+
+            <!-- Dynamic Activity Rows -->
+            <div class="space-y-3" id="activity-stream-list">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- TABBED RECORDS VIEWS: PRODUCTS, CLAIMS, SERVICE, RULES             -->
+        <!-- =================================================================== -->
+        
+        <!-- SECTION 1: MY PRODUCTS & WARRANTIES TABLE -->
+        <div id="section-products" class="crm-card p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div>
+              <h2 class="text-lg font-bold text-gray-900">Product Registration & Warranty Directory</h2>
+              <p class="text-xs text-gray-500">Search and filter active vs expired warranties with invoice proof</p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <!-- Search Input -->
+              <div class="relative">
+                <input type="text" id="product-filter-search" oninput="loadProducts()" placeholder="Filter by product, brand, S/N..." class="text-xs bg-gray-50 border border-gray-200 rounded-xl py-2 pl-8 pr-3 w-56 outline-none focus:border-black transition">
+                <span class="absolute left-2.5 top-2 text-gray-400 text-xs">🔍</span>
+              </div>
+
+              <!-- Status Filter Pills -->
+              <div class="inline-flex bg-gray-100 p-1 rounded-xl text-xs font-medium">
+                <button onclick="setProductStatusFilter('all')" id="filter-status-all" class="px-3 py-1 rounded-lg bg-white shadow-2xs font-semibold text-gray-900 transition">All</button>
+                <button onclick="setProductStatusFilter('active')" id="filter-status-active" class="px-3 py-1 rounded-lg text-gray-600 hover:text-black transition">Active</button>
+                <button onclick="setProductStatusFilter('expiring_soon')" id="filter-status-expiring_soon" class="px-3 py-1 rounded-lg text-gray-600 hover:text-black transition">Expiring Soon</button>
+                <button onclick="setProductStatusFilter('expired')" id="filter-status-expired" class="px-3 py-1 rounded-lg text-gray-600 hover:text-black transition">Expired</button>
+              </div>
+
+              <!-- Register Product Button -->
+              <button onclick="openRegisterProductModal()" class="bg-[#111418] hover:bg-black text-white text-xs font-semibold px-4 py-2 rounded-xl transition inline-flex items-center gap-1.5 shadow-xs">
+                <span>+</span>
+                <span>Register Product</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Product Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-gray-50/75 text-gray-500 uppercase text-[10px] tracking-wider border-y border-gray-200">
+                <tr>
+                  <th class="py-3 px-4">Product & Model</th>
+                  <th class="py-3 px-4">Serial Number</th>
+                  <th class="py-3 px-4">Purchase Date</th>
+                  <th class="py-3 px-4">Warranty End</th>
+                  <th class="py-3 px-4">Status</th>
+                  <th class="py-3 px-4">Verification</th>
+                  <th class="py-3 px-4">Invoice</th>
+                  <th class="py-3 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="products-table-body" class="divide-y divide-gray-100">
+                <!-- Dynamically loaded rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SECTION 2: WARRANTY CLAIMS PIPELINE -->
+        <div id="section-claims" class="crm-card p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div>
+              <h2 class="text-lg font-bold text-gray-900">Warranty Claims Lifecycle Management</h2>
+              <p class="text-xs text-gray-500">Draft → Submitted → Under Review → Service Scheduled → Resolved</p>
+            </div>
+
+            <button onclick="openClaimModal()" class="bg-black text-white text-xs font-semibold px-4 py-2 rounded-xl transition inline-flex items-center gap-1.5">
+              <span>+</span>
+              <span>File New Claim</span>
+            </button>
+          </div>
+
+          <!-- Claims Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-gray-50 text-gray-500 uppercase text-[10px] tracking-wider border-y border-gray-200">
+                <tr>
+                  <th class="py-3 px-4">Claim #</th>
+                  <th class="py-3 px-4">Product</th>
+                  <th class="py-3 px-4">Issue Description</th>
+                  <th class="py-3 px-4">Submitted By</th>
+                  <th class="py-3 px-4">Status Pipeline</th>
+                  <th class="py-3 px-4">Admin Decision</th>
+                  <th class="py-3 px-4 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="claims-table-body" class="divide-y divide-gray-100">
+                <!-- Dynamically loaded rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SECTION 3: SERVICE BAY QUEUE -->
+        <div id="section-service" class="crm-card p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div>
+              <h2 class="text-lg font-bold text-gray-900">Service Center Bay & Technician Dispatch</h2>
+              <p class="text-xs text-gray-500">Assigned repairs, diagnostics, and status updates</p>
+            </div>
+
+            <button onclick="openServiceRequestModal()" class="bg-black text-white text-xs font-semibold px-4 py-2 rounded-xl transition inline-flex items-center gap-1.5">
+              <span>+</span>
+              <span>Request Repair Service</span>
+            </button>
+          </div>
+
+          <!-- Service Queue Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-gray-50 text-gray-500 uppercase text-[10px] tracking-wider border-y border-gray-200">
+                <tr>
+                  <th class="py-3 px-4">Ticket #</th>
+                  <th class="py-3 px-4">Product</th>
+                  <th class="py-3 px-4">Issue Title</th>
+                  <th class="py-3 px-4">Assigned Tech</th>
+                  <th class="py-3 px-4">Time Slot</th>
+                  <th class="py-3 px-4">Status</th>
+                  <th class="py-3 px-4 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="service-table-body" class="divide-y divide-gray-100">
+                <!-- Dynamically loaded rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SECTION 4: COVERAGE RULES ENGINE -->
+        <div id="section-rules" class="crm-card p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div>
+              <h2 class="text-lg font-bold text-gray-900">Manufacturer Coverage Rules Engine</h2>
+              <p class="text-xs text-gray-500">Configured by Warranty Administrators to govern eligibility & claim verification</p>
+            </div>
+
+            <button onclick="openRuleModal()" class="bg-black text-white text-xs font-semibold px-4 py-2 rounded-xl transition inline-flex items-center gap-1.5">
+              <span>+</span>
+              <span>Configure Coverage Rule</span>
+            </button>
+          </div>
+
+          <!-- Rules Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="rules-cards-grid">
+            <!-- Dynamically loaded rules -->
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 3. MODALS & SLIDE-OVER PANELS                                             -->
+  <!-- ========================================================================= -->
+
+  <!-- AUTHENTICATION MODAL (LOGIN / SIGNUP + 4-ROLE 1-CLICK DEMO LOGIN) -->
+  <div id="modal-auth" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 modal-enter border border-gray-100 shadow-2xl">
+      <div class="flex justify-between items-center mb-5">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded-lg bg-black text-white flex items-center justify-center font-bold text-[10px] tracking-wide">
+            DWT
+          </div>
+          <span class="font-bold text-sm text-gray-900">DWT Portal · Account Access</span>
+        </div>
+        <button onclick="closeModal('modal-auth')" class="text-gray-400 hover:text-black text-lg font-bold">✕</button>
+      </div>
+
+      <!-- Tab Buttons -->
+      <div class="flex bg-gray-100 p-1 rounded-xl text-xs font-medium mb-5">
+        <button onclick="setAuthTab('signin')" id="tab-auth-signin" class="flex-1 py-1.5 rounded-lg bg-white shadow-2xs font-semibold text-gray-900">Sign In</button>
+        <button onclick="setAuthTab('signup')" id="tab-auth-signup" class="flex-1 py-1.5 rounded-lg text-gray-600 hover:text-black">Create Account</button>
+      </div>
+
+      <!-- 1-Click Fast Role Demo Access (Crucial for Reviewers!) -->
+      <div class="mb-5 p-3.5 rounded-2xl bg-gray-50 border border-gray-200">
+        <div class="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-2">⚡ 1-Click Quick Demo Sign In</div>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <button onclick="quickLogin('alex@owner.com')" class="p-2 bg-white hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-xl text-left transition flex items-center gap-2">
+            <span>👤</span>
+            <div>
+              <div class="font-bold text-gray-900 leading-tight">Product Owner</div>
+              <div class="text-[10px] text-gray-500">Alex Vance</div>
+            </div>
+          </button>
+
+          <button onclick="quickLogin('sarah@servicecenter.com')" class="p-2 bg-white hover:bg-emerald-50 border border-gray-200 hover:border-emerald-300 rounded-xl text-left transition flex items-center gap-2">
+            <span>🏢</span>
+            <div>
+              <div class="font-bold text-gray-900 leading-tight">Service Staff</div>
+              <div class="text-[10px] text-gray-500">Sarah Connor</div>
+            </div>
+          </button>
+
+          <button onclick="quickLogin('david@technician.com')" class="p-2 bg-white hover:bg-amber-50 border border-gray-200 hover:border-amber-300 rounded-xl text-left transition flex items-center gap-2">
+            <span>🔧</span>
+            <div>
+              <div class="font-bold text-gray-900 leading-tight">Technician</div>
+              <div class="text-[10px] text-gray-500">David Miller</div>
+            </div>
+          </button>
+
+          <button onclick="quickLogin('elena@admin.com')" class="p-2 bg-white hover:bg-purple-50 border border-gray-200 hover:border-purple-300 rounded-xl text-left transition flex items-center gap-2">
+            <span>🛡️</span>
+            <div>
+              <div class="font-bold text-gray-900 leading-tight">Administrator</div>
+              <div class="text-[10px] text-gray-500">Elena Rostova</div>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Standard Form -->
+      <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-3 text-xs">
+        <div id="auth-field-name" class="hidden">
+          <label class="block font-medium text-gray-700 mb-1">Full Name</label>
+          <input type="text" id="auth-name" placeholder="John Doe" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+        </div>
+
+        <div id="auth-field-role" class="hidden">
+          <label class="block font-medium text-gray-700 mb-1">Account Role</label>
+          <select id="auth-role" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+            <option value="product_owner">Product Owner (registers products, claims)</option>
+            <option value="service_center_staff">Service Center Staff (assigns repairs)</option>
+            <option value="service_technician">Service Technician (executes repairs)</option>
+            <option value="warranty_admin">Warranty Administrator (rules & approvals)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-medium text-gray-700 mb-1">Email Address</label>
+          <input type="email" id="auth-email" required placeholder="alex@owner.com" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+        </div>
+
+        <div>
+          <label class="block font-medium text-gray-700 mb-1">Password</label>
+          <input type="password" id="auth-password" required placeholder="••••••••" value="password123" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+        </div>
+
+        <button type="submit" id="auth-submit-btn" class="w-full bg-black text-white font-semibold rounded-xl py-3 mt-4 hover:bg-gray-800 transition">
+          Sign In
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- OCR INVOICE SCANNER & PRODUCT REGISTRATION MODAL -->
+  <div id="modal-ocr" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-3xl w-full p-6 modal-enter border border-gray-100 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-4">
+        <div>
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-lime-100 text-lime-800 text-[10px] font-bold uppercase mb-1">
+            ⚡ Automated OCR Intelligence
+          </div>
+          <h3 class="text-lg font-bold text-gray-900">Register Product & Scan Proof of Purchase</h3>
+          <p class="text-xs text-gray-500">Upload receipt/invoice for auto-extraction. Manual correction always possible.</p>
+        </div>
+        <button onclick="closeModal('modal-ocr')" class="text-gray-400 hover:text-black text-lg font-bold">✕</button>
+      </div>
+
+      <!-- Sample Invoice Picker for Instant Demo -->
+      <div class="mb-5 p-3 rounded-2xl bg-gray-50 border border-gray-200 text-xs">
+        <div class="font-bold text-gray-700 mb-2">Select a Sample Invoice for Instant OCR Extraction:</div>
+        <div class="flex flex-wrap gap-2">
+          <button type="button" onclick="loadSampleOcr('apple')" class="px-3 py-1.5 rounded-xl bg-white border border-gray-300 hover:border-black font-medium transition">
+            🍎 Apple Store 5th Ave
+          </button>
+          <button type="button" onclick="loadSampleOcr('sony')" class="px-3 py-1.5 rounded-xl bg-white border border-gray-300 hover:border-black font-medium transition">
+            📷 B&H Photo Sony Receipt
+          </button>
+          <button type="button" onclick="loadSampleOcr('samsung')" class="px-3 py-1.5 rounded-xl bg-white border border-gray-300 hover:border-black font-medium transition">
+            📱 Samsung Experience Store
+          </button>
+          <button type="button" onclick="loadSampleOcr('dyson')" class="px-3 py-1.5 rounded-xl bg-white border border-gray-300 hover:border-black font-medium transition">
+            🌀 Dyson Direct Invoice
+          </button>
+        </div>
+      </div>
+
+      <!-- OCR Status Banner -->
+      <div id="ocr-status-banner" class="hidden mb-4 p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span>✅</span>
+          <span id="ocr-status-text">OCR extraction succeeded with 98.4% confidence score!</span>
+        </div>
+        <span class="text-[11px] font-semibold text-emerald-700 bg-white px-2 py-0.5 rounded-md border border-emerald-200">Manual review enabled</span>
+      </div>
+
+      <!-- Form Grid (Side by Side Review & Edit) -->
+      <form id="product-registration-form" onsubmit="handleProductSubmit(event)" class="space-y-4 text-xs">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">Product Name *</label>
+            <input type="text" id="reg-product-name" required placeholder="e.g. MacBook Pro 16 M3 Max" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+          </div>
+
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">Manufacturer / Brand *</label>
+            <input type="text" id="reg-brand" required placeholder="e.g. Apple" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+          </div>
+
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">Serial Number (S/N) *</label>
+            <input type="text" id="reg-serial" required placeholder="e.g. C02G4589MD6R" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black font-mono">
+          </div>
+
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">Model Number</label>
+            <input type="text" id="reg-model" placeholder="e.g. A2991" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+          </div>
+
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">Product Category</label>
+            <select id="reg-category" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+              <option value="Laptops & Computers">Laptops & Computers</option>
+              <option value="Smartphones & Tablets">Smartphones & Tablets</option>
+              <option value="Cameras & Audio">Cameras & Audio</option>
+              <option value="Workstations & Displays">Workstations & Displays</option>
+              <option value="Home Appliances">Home Appliances</option>
+              <option value="Television & Display">Television & Display</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">Purchase Date *</label>
+            <input type="date" id="reg-purchase-date" required value="2025-11-15" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+          </div>
+
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">Purchase Price ($ USD)</label>
+            <input type="number" step="0.01" id="reg-price" placeholder="1299.00" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+          </div>
+
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">Retailer / Store Name</label>
+            <input type="text" id="reg-retailer" placeholder="e.g. Apple Fifth Avenue" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+          </div>
+
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">Warranty Duration (Months)</label>
+            <input type="number" id="reg-duration" value="12" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+          </div>
+
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">Warranty Plan Tier</label>
+            <select id="reg-warranty-type" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+              <option value="standard">Standard Manufacturer Limited (12-24 Mo)</option>
+              <option value="extended">Extended Care Protection Plan</option>
+              <option value="accidental_protection">Accidental Damage Protection (ADH)</option>
+            </select>
+          </div>
+
+        </div>
+
+        <!-- Raw OCR Text Box for review -->
+        <div class="mt-2">
+          <label class="block font-medium text-gray-700 mb-1">Extracted OCR Transcript (Read-Only Audit Trail)</label>
+          <textarea id="reg-ocr-raw" rows="3" class="w-full bg-gray-100 border border-gray-200 rounded-xl p-2.5 text-[11px] font-mono text-gray-700 outline-none" readonly>Upload receipt or select sample to extract OCR data...</textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
+          <button type="button" onclick="closeModal('modal-ocr')" class="px-4 py-2 rounded-xl text-gray-600 hover:text-black">Cancel</button>
+          <button type="submit" class="bg-black hover:bg-gray-800 text-white font-semibold px-6 py-2.5 rounded-xl transition shadow-xs">Save & Verify Warranty</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- WARRANTY VERIFICATION MODAL -->
+  <div id="modal-verify" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 modal-enter border border-gray-100 shadow-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <div>
+          <h3 class="text-lg font-bold text-gray-900">Manufacturer Warranty Verification</h3>
+          <p class="text-xs text-gray-500">Check coverage eligibility and official terms against manufacturer register</p>
+        </div>
+        <button onclick="closeModal('modal-verify')" class="text-gray-400 hover:text-black text-lg font-bold">✕</button>
+      </div>
+
+      <form onsubmit="handleVerificationSubmit(event)" class="space-y-3 text-xs mb-4">
+        <div>
+          <label class="block font-medium text-gray-700 mb-1">Manufacturer Brand</label>
+          <select id="verify-brand" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+            <option value="Apple">Apple</option>
+            <option value="Samsung">Samsung</option>
+            <option value="Sony">Sony</option>
+            <option value="Dell">Dell</option>
+            <option value="Dyson">Dyson</option>
+            <option value="LG">LG</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-medium text-gray-700 mb-1">Serial Number (S/N)</label>
+          <input type="text" id="verify-serial" required placeholder="e.g. C02G4589MD6R" value="C02G4589MD6R" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black font-mono">
+        </div>
+
+        <div>
+          <label class="block font-medium text-gray-700 mb-1">Purchase Date (Optional)</label>
+          <input type="date" id="verify-date" value="2025-11-15" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+        </div>
+
+        <button type="submit" class="w-full bg-black text-white font-semibold rounded-xl py-2.5 hover:bg-gray-800 transition">
+          Run Verification Check
+        </button>
+      </form>
+
+      <!-- Verification Result Box -->
+      <div id="verify-result-box" class="hidden p-4 rounded-2xl bg-gray-50 border border-gray-200 text-xs space-y-2">
+        <!-- Populated via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- WARRANTY CLAIM SUBMISSION MODAL -->
+  <div id="modal-claim" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 modal-enter border border-gray-100 shadow-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <div>
+          <h3 class="text-lg font-bold text-gray-900">File Warranty Claim</h3>
+          <p class="text-xs text-gray-500">Tracked through: Draft → Submitted → Review → Service Scheduled → Resolved</p>
+        </div>
+        <button onclick="closeModal('modal-claim')" class="text-gray-400 hover:text-black text-lg font-bold">✕</button>
+      </div>
+
+      <form onsubmit="handleClaimSubmit(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-medium text-gray-700 mb-1">Select Registered Product *</label>
+          <select id="claim-product-id" required class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+            <!-- Populated via JS with active products -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-medium text-gray-700 mb-1">Issue Category *</label>
+          <select id="claim-category" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+            <option value="Hardware Component Defect">Hardware Component Defect</option>
+            <option value="Display / Panel Failure">Display / Panel Failure</option>
+            <option value="Battery & Charging">Battery & Charging</option>
+            <option value="Motherboard & Power">Motherboard & Power</option>
+            <option value="Sensor & Optics">Sensor & Optics</option>
+            <option value="Audio / Speaker Distortion">Audio / Speaker Distortion</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-medium text-gray-700 mb-1">Detailed Issue Description *</label>
+          <textarea id="claim-description" required rows="3" placeholder="Describe the defect, when it started, and steps to reproduce..." class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black"></textarea>
+        </div>
+
+        <div>
+          <label class="block font-medium text-gray-700 mb-1">Defect Evidence Photo URL</label>
+          <input type="url" id="claim-photo-url" value="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=600&q=80" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+        </div>
+
+        <button type="submit" class="w-full bg-black text-white font-semibold rounded-xl py-2.5 hover:bg-gray-800 transition">
+          Submit Claim to Administrator
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- SERVICE REQUEST & DISPATCH MODAL -->
+  <div id="modal-service" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 modal-enter border border-gray-100 shadow-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <div>
+          <h3 class="text-lg font-bold text-gray-900">Service Request & Technician Dispatch</h3>
+          <p class="text-xs text-gray-500">Service Center Staff receives and assigns bay slots</p>
+        </div>
+        <button onclick="closeModal('modal-service')" class="text-gray-400 hover:text-black text-lg font-bold">✕</button>
+      </div>
+
+      <form onsubmit="handleServiceSubmit(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-medium text-gray-700 mb-1">Product *</label>
+          <select id="sr-product-id" required class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-medium text-gray-700 mb-1">Issue Title *</label>
+          <input type="text" id="sr-title" required placeholder="e.g. Battery Calibration & Diagnostics" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+        </div>
+
+        <div>
+          <label class="block font-medium text-gray-700 mb-1">Description</label>
+          <textarea id="sr-desc" rows="2" placeholder="Details for service technician..." class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">Priority</label>
+            <select id="sr-priority" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">Assign Technician</label>
+            <select id="sr-tech-id" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 outline-none focus:border-black">
+              <option value="3">David Miller (Senior Tech)</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full bg-black text-white font-semibold rounded-xl py-2.5 hover:bg-gray-800 transition">
+          Schedule Service Bay
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- INVOICE VIEWER MODAL -->
+  <div id="modal-invoice" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 modal-enter border border-gray-100 shadow-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <div>
+          <h3 class="text-lg font-bold text-gray-900" id="invoice-modal-title">Proof of Purchase Invoice</h3>
+          <p class="text-xs text-gray-500" id="invoice-modal-subtitle">Stored securely in SQLite repository</p>
+        </div>
+        <button onclick="closeModal('modal-invoice')" class="text-gray-400 hover:text-black text-lg font-bold">✕</button>
+      </div>
+
+      <div class="rounded-2xl border border-gray-200 p-4 bg-gray-50 mb-4 text-xs font-mono whitespace-pre-wrap text-gray-800" id="invoice-modal-content">
+        <!-- Rendered invoice details -->
+      </div>
+
+      <div class="flex justify-between items-center">
+        <a id="invoice-download-btn" href="#" target="_blank" class="text-xs font-semibold text-blue-600 hover:underline">
+          Download Original Receipt ↗
+        </a>
+        <button onclick="closeModal('modal-invoice')" class="bg-black text-white px-4 py-2 rounded-xl text-xs font-semibold">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- REMINDERS SLIDE-OVER DRAWER -->
+  <div id="drawer-reminders" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex justify-end hidden">
+    <div class="bg-white w-full max-w-md h-full p-6 shadow-2xl flex flex-col justify-between overflow-y-auto">
+      <div>
+        <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">🔔</span>
+            <h3 class="font-bold text-base text-gray-900">Warranty Reminders & Alerts</h3>
+          </div>
+          <button onclick="closeRemindersDrawer()" class="text-gray-400 hover:text-black font-bold">✕</button>
+        </div>
+
+        <p class="text-xs text-gray-500 mb-4">Email and push alerts sent before warranty expiry and service due dates.</p>
+
+        <!-- Reminders List -->
+        <div class="space-y-3" id="reminders-drawer-list">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <div class="pt-4 border-t border-gray-100 text-center">
+        <button onclick="closeRemindersDrawer()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-semibold py-2.5 rounded-xl transition">
+          Close Alerts
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP LOGIC -->
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
+
