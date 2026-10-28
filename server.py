@@ -14,7 +14,7 @@ TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 class WarrantyServerHandler(SimpleHTTPRequestHandler):
     def end_headers(self):
         self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, PATCH, OPTIONS')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
         super().end_headers()
 
@@ -36,13 +36,12 @@ class WarrantyServerHandler(SimpleHTTPRequestHandler):
             return
 
         # 2. Main SPA HTML route
-        if path == '/' or path == '/index.html' or path == '/dashboard' or path == '/login' or path == '/signup':
+        if path in ('/', '/index.html', '/dashboard', '/login', '/signup', '/portal'):
             self.serve_template('index.html')
             return
 
         # 3. Static Files
         if path.startswith('/static/'):
-            # Strip '/static/' prefix and look inside STATIC_DIR
             relative_path = path[len('/static/'):]
             full_path = os.path.join(STATIC_DIR, relative_path)
             if os.path.exists(full_path) and os.path.isfile(full_path):
@@ -74,43 +73,108 @@ class WarrantyServerHandler(SimpleHTTPRequestHandler):
 
         self.send_json({"error": "Not Found"}, 404)
 
+    def do_DELETE(self):
+        parsed = urllib.parse.urlparse(self.path)
+        path = parsed.path
+        query = urllib.parse.parse_qs(parsed.query)
+        params = {k: v[0] for k, v in query.items()}
+
+        if path.startswith('/api/'):
+            self.handle_api_delete(path, params)
+            return
+
+        self.send_json({"error": "Not Found"}, 404)
+
     # ---------------- API Dispatchers ---------------- #
     def handle_api_get(self, path, params):
         try:
             if path == '/api/health':
-                self.send_json({"status": "healthy", "service": "digital-warranty-tracker", "database": "sqlite3"})
+                self.send_json({"status": "healthy", "service": "digital-warranty-tracker", "database": "connected"})
+
             elif path == '/api/users':
-                res, code = api.get_users_list(params.get('role'))
+                # Use admin_get_users for richer info (product_count, etc)
+                search = params.get('search')
+                role = params.get('role')
+                res, code = api.admin_get_users(search=search, role_filter=role)
                 self.send_json(res, code)
+
             elif path == '/api/products':
                 res, code = api.get_products(params)
                 self.send_json(res, code)
+
             elif path.startswith('/api/products/'):
                 parts = path.strip('/').split('/')
+                # /api/products/<id> or /api/products/<id>/certificate
                 if len(parts) == 3 and parts[2].isdigit():
                     prod_id = int(parts[2])
                     res, code = api.get_product_detail(prod_id)
                     self.send_json(res, code)
+                elif len(parts) == 4 and parts[2].isdigit() and parts[3] == 'certificate':
+                    prod_id = int(parts[2])
+                    res, code = api.get_warranty_certificate(prod_id)
+                    self.send_json(res, code)
                 else:
-                    self.send_json({"error": "Invalid product ID"}, 400)
+                    self.send_json({"error": "Invalid product endpoint"}, 400)
+
             elif path == '/api/claims':
                 res, code = api.get_claims(params)
                 self.send_json(res, code)
+
             elif path == '/api/service-requests':
                 res, code = api.get_service_requests(params)
                 self.send_json(res, code)
+
             elif path == '/api/rules':
                 res, code = api.get_coverage_rules()
                 self.send_json(res, code)
+
             elif path == '/api/reminders':
                 uid = int(params.get('user_id', 1))
                 res, code = api.get_reminders(uid)
                 self.send_json(res, code)
+
             elif path == '/api/dashboard/stats':
                 uid = int(params.get('user_id', 1))
                 role = params.get('role', 'product_owner')
                 res, code = api.get_dashboard_stats(uid, role)
                 self.send_json(res, code)
+
+            elif path == '/api/analytics':
+                res, code = api.get_analytics_data()
+                self.send_json(res, code)
+
+            elif path == '/api/technicians/workload':
+                res, code = api.get_technicians_workload()
+                self.send_json(res, code)
+
+            elif path == '/api/parts-requests':
+                res, code = api.get_parts_requests(params)
+                self.send_json(res, code)
+
+            elif path == '/api/categories-brands':
+                res, code = api.get_categories_and_brands()
+                self.send_json(res, code)
+
+            elif path == '/api/audit-logs':
+                search = params.get('search')
+                entity_type = params.get('entity_type')
+                limit = int(params.get('limit', 50))
+                res, code = api.get_audit_logs(search, entity_type, limit)
+                self.send_json(res, code)
+
+            elif path == '/api/reports/export':
+                report_type = params.get('type', 'products')
+                uid = int(params.get('user_id')) if params.get('user_id') and params.get('user_id').isdigit() else None
+                role = params.get('role', 'warranty_admin')
+                csv_data = api.export_report_csv(report_type, uid, role)
+                encoded = csv_data.encode('utf-8')
+                self.send_response(200)
+                self.send_header('Content-Type', 'text/csv; charset=utf-8')
+                self.send_header('Content-Disposition', f'attachment; filename="warranty_{report_type}_report.csv"')
+                self.send_header('Content-Length', str(len(encoded)))
+                self.end_headers()
+                self.wfile.write(encoded)
+
             else:
                 self.send_json({"error": "Endpoint not found"}, 404)
         except Exception as e:
@@ -123,6 +187,12 @@ class WarrantyServerHandler(SimpleHTTPRequestHandler):
                 self.send_json(res, code)
             elif path == '/api/auth/register':
                 res, code = api.handle_register(data)
+                self.send_json(res, code)
+            elif path == '/api/auth/send-otp':
+                res, code = api.handle_send_otp(data)
+                self.send_json(res, code)
+            elif path == '/api/auth/verify-otp':
+                res, code = api.handle_verify_otp(data)
                 self.send_json(res, code)
             elif path == '/api/products':
                 res, code = api.create_product(data)
@@ -147,6 +217,12 @@ class WarrantyServerHandler(SimpleHTTPRequestHandler):
                 rem_id = int(parts[2])
                 res, code = api.mark_reminder_read(rem_id)
                 self.send_json(res, code)
+            elif path == '/api/users':
+                res, code = api.admin_create_user(data)
+                self.send_json(res, code)
+            elif path == '/api/parts-requests':
+                res, code = api.create_parts_request(data)
+                self.send_json(res, code)
             else:
                 self.send_json({"error": "Endpoint not found"}, 404)
         except Exception as e:
@@ -159,11 +235,73 @@ class WarrantyServerHandler(SimpleHTTPRequestHandler):
                 claim_id = int(parts[2])
                 res, code = api.update_claim_status(claim_id, data)
                 self.send_json(res, code)
+
+            elif path.startswith('/api/products/'):
+                parts = path.strip('/').split('/')
+                # /api/products/<id>/verify
+                prod_id = int(parts[2])
+                if len(parts) == 4 and parts[3] == 'verify':
+                    res, code = api.verify_product(prod_id, data)
+                    self.send_json(res, code)
+                else:
+                    self.send_json({"error": "Invalid product endpoint"}, 400)
+
             elif path.startswith('/api/service-requests/'):
                 parts = path.strip('/').split('/')
+                # /api/service-requests/<id>
+                # /api/service-requests/<id>/cancel
+                # /api/service-requests/<id>/workflow
                 req_id = int(parts[2])
-                res, code = api.update_service_request(req_id, data)
-                self.send_json(res, code)
+                if len(parts) == 3:
+                    res, code = api.update_service_request(req_id, data)
+                    self.send_json(res, code)
+                elif len(parts) == 4 and parts[3] == 'cancel':
+                    uid = int(data.get('user_id', 1))
+                    reason = data.get('reason', 'Customer requested cancellation')
+                    res, code = api.cancel_service_request(req_id, uid, reason)
+                    self.send_json(res, code)
+                elif len(parts) == 4 and parts[3] == 'workflow':
+                    tech_id = int(data.get('technician_id', 3))
+                    res, code = api.technician_workflow_action(req_id, tech_id, data)
+                    self.send_json(res, code)
+                else:
+                    self.send_json({"error": "Invalid service request sub-endpoint"}, 400)
+
+            elif path.startswith('/api/users/'):
+                parts = path.strip('/').split('/')
+                if len(parts) == 3 and parts[2].isdigit():
+                    user_id = int(parts[2])
+                    res, code = api.admin_update_user(user_id, data)
+                    self.send_json(res, code)
+                else:
+                    self.send_json({"error": "Invalid user ID"}, 400)
+
+            elif path.startswith('/api/parts-requests/'):
+                parts = path.strip('/').split('/')
+                if len(parts) == 3 and parts[2].isdigit():
+                    part_id = int(parts[2])
+                    res, code = api.update_parts_request(part_id, data)
+                    self.send_json(res, code)
+                else:
+                    self.send_json({"error": "Invalid part request ID"}, 400)
+
+            else:
+                self.send_json({"error": "Endpoint not found"}, 404)
+        except Exception as e:
+            self.send_json({"error": str(e)}, 500)
+
+    def handle_api_delete(self, path, params):
+        try:
+            if path.startswith('/api/products/'):
+                parts = path.strip('/').split('/')
+                if len(parts) == 3 and parts[2].isdigit():
+                    prod_id = int(parts[2])
+                    uid = int(params.get('user_id', 1)) if params.get('user_id') else None
+                    role = params.get('role', 'warranty_admin')
+                    res, code = api.delete_product(prod_id, uid, role)
+                    self.send_json(res, code)
+                else:
+                    self.send_json({"error": "Invalid product ID"}, 400)
             else:
                 self.send_json({"error": "Endpoint not found"}, 404)
         except Exception as e:
@@ -229,13 +367,17 @@ class WarrantyServerHandler(SimpleHTTPRequestHandler):
         self.wfile.write(content)
 
 def run(port=8080):
+    if hasattr(sys.stdout, 'reconfigure'):
+        try:
+            sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+        except Exception:
+            pass
     database.init_db()
     server_address = ('0.0.0.0', port)
     httpd = ThreadingHTTPServer(server_address, WarrantyServerHandler)
-    print(f"🚀 Digital Warranty Tracker running on http://localhost:{port}")
+    print(f"[*] Digital Warranty Tracker running on http://localhost:{port}")
     httpd.serve_forever()
 
 if __name__ == '__main__':
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 8080
     run(port)
-

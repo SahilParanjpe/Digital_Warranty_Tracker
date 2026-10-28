@@ -170,3 +170,79 @@ body {
   }
 }
 
+/* Role Selection Cards on Auth Page */
+.role-card {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-width: 2px;
+}
+.role-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+}
+.role-card.role-active-product_owner {
+  border-color: #2563eb !important;
+  background-color: #eff6ff !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18), 0 10px 25px -5px rgba(37, 99, 235, 0.15) !important;
+}
+.role-card.role-active-service_center_staff {
+  border-color: #d97706 !important;
+  background-color: #fffbeb !important;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.18), 0 10px 25px -5px rgba(217, 119, 6, 0.15) !important;
+}
+.role-card.role-active-service_technician {
+  border-color: #059669 !important;
+  background-color: #ecfdf5 !important;
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.18), 0 10px 25px -5px rgba(5, 150, 105, 0.15) !important;
+}
+.role-card.role-active-warranty_admin {
+  border-color: #7c3aed !important;
+  background-color: #f5f3ff !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.18), 0 10px 25px -5px rgba(124, 58, 237, 0.15) !important;
+}
+
+/* Modern Auth Portal Styling */
+.auth-ambient-bg {
+  background-color: #f8fafc;
+  background-image: 
+    radial-gradient(at 10% 15%, rgba(219, 234, 254, 0.7) 0px, transparent 45%),
+    radial-gradient(at 90% 20%, rgba(254, 240, 138, 0.45) 0px, transparent 40%),
+    radial-gradient(at 50% 85%, rgba(241, 245, 249, 0.8) 0px, transparent 50%);
+  background-repeat: no-repeat;
+}
+
+.auth-glass-card {
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.03),
+    0 20px 35px -10px rgba(15, 23, 42, 0.08);
+}
+.demo-chip {
+  transition: all 0.15s ease;
+}
+.demo-chip:hover {
+  transform: translateY(-1px);
+}
+.demo-chip:active {
+  transform: translateY(0);
+}
+
+/* Editorial Serif & Luxury Typography */
+.font-serif {
+  font-family: 'Playfair Display', Georgia, Cambria, 'Times New Roman', Times, serif !important;
+}
+
+/* Subtle micro-shadows & glass effects */
+.shadow-2xs {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+}
+
+/* Sleek Auth Inputs */
+#view-auth input:focus,
+#view-auth select:focus {
+  border-color: #111827 !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.06);
+}

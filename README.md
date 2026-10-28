@@ -14,10 +14,10 @@ Built with a **Python REST backend**, **SQLite database**, and a high-fidelity f
 
 | Role | Key Responsibilities & Capabilities | Customized Dashboard View & KPIs | Demo Login |
 | :--- | :--- | :--- | :--- |
-| 👤 **Product Owner** | Registers products, uploads invoice receipts with OCR data extraction, receives warranty expiry reminders, and files claims with defect photos. | **Personal Warranty Vault View:**<br>• Focus: My Products Directory & OCR Scanner<br>• Quick Actions: `Instant OCR Scan`, `+ Register Product`, `+ File Claim`<br>• KPIs: Total Vault Value (₹), Claims Filed, Verification Rate (100%), 30-Day Expiry Alerts | `alex@owner.com`<br>`password123` |
-| 🏢 **Service Center Staff** | Receives warranty service requests, allocates bay slots, and dispatches repair jobs to available technicians. | **Service Dispatch & Intake Desk View:**<br>• Focus: Service Bay Queue & Workshop Schedule<br>• Quick Actions: `Dispatch Technician`, `+ New Service Intake`, `Bay Schedule`<br>• KPIs: Pending Intake Queue, Active Service Bays, On-Duty Techs, Dispatch SLA | `sarah@servicecenter.com`<br>`password123` |
-| 🔧 **Service Technician** | Views assigned service tickets, inspects hardware, records diagnostic notes, requisitions parts, and completes repair orders. | **Senior Technician Workbench View:**<br>• Focus: Assigned Bench Work Orders & QC<br>• Quick Actions: `Complete Bench Job ✓`, `Update Diagnostic Notes`, `Requisition Parts`<br>• KPIs: Jobs Assigned Today, Active Bench Work, First-Time Fix Rate (96.4%), Parts Queue | `david@technician.com`<br>`password123` |
-| 🛡️ **Warranty Administrator** | Configures manufacturer coverage rules (standard terms, ADH coverage, grace periods) and adjudicates warranty claims. | **Warranty Governance & Claims Desk View:**<br>• Focus: Claims Lifecycle Adjudication & Policy Rules Engine<br>• Quick Actions: `Adjudicate Claims`, `+ Configure Policy Rule`, `Manufacturer Policies`<br>• KPIs: Pending Claims Value (₹), Approved Payouts (₹), Active Brand Rules, Rejection Rate | `elena@admin.com`<br>`password123` |
+| 👤 **Product Owner** | Registers products, uploads invoice receipts with OCR data extraction, receives warranty expiry reminders, and files claims with defect photos. | **Personal Warranty Vault View:**<br>• Focus: My Products Directory & OCR Scanner<br>• Quick Actions: `Instant OCR Scan`, `+ Register Product`, `+ File Claim`<br>• KPIs: Total Vault Value (₹), Claims Filed, Verification Rate (100%), 30-Day Expiry Alerts | `sahilparanjpe@gmail.com`<br>`12345678` |
+| 🏢 **Service Center Staff** | Receives warranty service requests, allocates bay slots, and dispatches repair jobs to available technicians. | **Service Dispatch & Intake Desk View:**<br>• Focus: Service Bay Queue & Workshop Schedule<br>• Quick Actions: `Dispatch Technician`, `+ New Service Intake`, `Bay Schedule`<br>• KPIs: Pending Intake Queue, Active Service Bays, On-Duty Techs, Dispatch SLA | `yashparab@gmail.com`<br>`12345678` |
+| 🔧 **Service Technician** | Views assigned service tickets, inspects hardware, records diagnostic notes, requisitions parts, and completes repair orders. | **Senior Technician Workbench View:**<br>• Focus: Assigned Bench Work Orders & QC<br>• Quick Actions: `Complete Bench Job ✓`, `Update Diagnostic Notes`, `Requisition Parts`<br>• KPIs: Jobs Assigned Today, Active Bench Work, First-Time Fix Rate (96.4%), Parts Queue | `rishilparmar@gmail.com`<br>`12345678` |
+| 🛡️ **Warranty Administrator** | Configures manufacturer coverage rules (standard terms, ADH coverage, grace periods) and adjudicates warranty claims. | **Warranty Governance & Claims Desk View:**<br>• Focus: Claims Lifecycle Adjudication & Policy Rules Engine<br>• Quick Actions: `Adjudicate Claims`, `+ Configure Policy Rule`, `Manufacturer Policies`<br>• KPIs: Pending Claims Value (₹), Approved Payouts (₹), Active Brand Rules, Rejection Rate | `yashparekh@gmail.com`<br>`12345678` |
 
 *Note: The application includes a top role bar and a 1-click Quick Demo Login in the modal to instantly toggle between all 4 perspectives.*
 
@@ -25,7 +25,7 @@ Built with a **Python REST backend**, **SQLite database**, and a high-fidelity f
 
 ## 🗄️ Database Tables (SQLite: `warranty_tracker.db`)
 
-The SQLite database schema is defined in [`schema.sql`](file:///home/students/Desktop/158/schema.sql) and managed via [`database.py`](file:///home/students/Desktop/158/database.py):
+The SQLite database schema is defined in [`schema.sql`](schema.sql) and managed via [`database.py`](database.py):
 
 1. **`users`**
    - Stores user accounts, authentication credentials (SHA-256 password hash), avatars, and roles (`product_owner`, `service_center_staff`, `service_technician`, `warranty_admin`).

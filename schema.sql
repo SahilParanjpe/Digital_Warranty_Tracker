@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS users (
     phone TEXT,
     avatar_url TEXT,
     organization TEXT,
+    is_active INTEGER DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -83,6 +84,9 @@ CREATE TABLE IF NOT EXISTS warranty_claims (
     admin_notes TEXT,
     claim_resolution TEXT,
     approved_amount REAL DEFAULT 0.0,
+    rejection_reason TEXT,
+    fraud_flag INTEGER DEFAULT 0,
+    preferred_datetime TEXT,
     decided_by INTEGER REFERENCES users(id),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -102,8 +106,14 @@ CREATE TABLE IF NOT EXISTS service_requests (
     photo_url TEXT,
     status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'assigned', 'in_progress', 'awaiting_parts', 'completed', 'cancelled')),
     priority TEXT NOT NULL DEFAULT 'medium' CHECK(priority IN ('low', 'medium', 'high', 'urgent')),
-    technician_notes TEXT,
+    diagnosis TEXT,
+    root_cause TEXT,
+    troubleshooting_steps TEXT,
+    parts_used TEXT,
+    repair_evidence_url TEXT,
+    cancellation_reason TEXT,
     scheduled_slot TEXT,
+    preferred_datetime TEXT,
     completed_at DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -115,7 +125,7 @@ CREATE TABLE IF NOT EXISTS reminders (
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
     service_request_id INTEGER REFERENCES service_requests(id) ON DELETE SET NULL,
-    reminder_type TEXT NOT NULL CHECK(reminder_type IN ('warranty_expiry_30d', 'warranty_expiry_7d', 'warranty_expired', 'service_due', 'claim_status')),
+    reminder_type TEXT NOT NULL CHECK(reminder_type IN ('warranty_expiry_30d', 'warranty_expiry_7d', 'warranty_expired', 'service_due', 'claim_status', 'warranty_rejected', 'warranty_verified')),
     title TEXT NOT NULL,
     message TEXT NOT NULL,
     due_date DATE NOT NULL,
@@ -136,6 +146,20 @@ CREATE TABLE IF NOT EXISTS activity_logs (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+-- 9. Parts Requests (Requested by Technicians, approved/dispatched by Service Staff/Admin)
+CREATE TABLE IF NOT EXISTS parts_requests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    service_request_id INTEGER REFERENCES service_requests(id) ON DELETE CASCADE,
+    technician_id INTEGER REFERENCES users(id),
+    part_name TEXT NOT NULL,
+    part_number TEXT,
+    quantity INTEGER DEFAULT 1,
+    status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'approved', 'dispatched', 'delivered', 'rejected')),
+    notes TEXT,
+    requested_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_products_owner ON products(owner_id);
 CREATE INDEX IF NOT EXISTS idx_products_status ON products(status);
@@ -145,4 +169,6 @@ CREATE INDEX IF NOT EXISTS idx_claims_status ON warranty_claims(status);
 CREATE INDEX IF NOT EXISTS idx_service_assigned ON service_requests(assigned_technician_id);
 CREATE INDEX IF NOT EXISTS idx_service_status ON service_requests(status);
 CREATE INDEX IF NOT EXISTS idx_reminders_user ON reminders(user_id, is_read);
+CREATE INDEX IF NOT EXISTS idx_parts_service ON parts_requests(service_request_id);
+CREATE INDEX IF NOT EXISTS idx_parts_tech ON parts_requests(technician_id);
 

@@ -16,19 +16,88 @@ def get_db_connection():
     conn.execute("PRAGMA journal_mode = WAL")
     return conn
 
+def run_migrations(conn):
+    cur = conn.cursor()
+    # 1. users columns
+    user_cols = [
+        ('is_active', 'INTEGER DEFAULT 1'),
+        ('address', 'TEXT'),
+        ('pincode', 'TEXT'),
+        ('branch_code', 'TEXT'),
+        ('employee_id', 'TEXT'),
+        ('city', 'TEXT'),
+        ('specialization', 'TEXT'),
+        ('experience_level', 'TEXT'),
+        ('certifications', 'TEXT'),
+        ('service_area', 'TEXT'),
+        ('is_email_verified', 'INTEGER DEFAULT 0'),
+        ('is_phone_verified', 'INTEGER DEFAULT 0')
+    ]
+    for col, typ in user_cols:
+        try:
+            cur.execute(f"ALTER TABLE users ADD COLUMN {col} {typ}")
+        except sqlite3.OperationalError:
+            pass
+
+    # 2. warranty_claims columns
+    for col, typ in [('rejection_reason', 'TEXT'), ('fraud_flag', 'INTEGER DEFAULT 0'), ('preferred_datetime', 'TEXT')]:
+        try:
+            cur.execute(f"ALTER TABLE warranty_claims ADD COLUMN {col} {typ}")
+        except sqlite3.OperationalError:
+            pass
+
+    # 3. service_requests columns
+    for col, typ in [
+        ('diagnosis', 'TEXT'),
+        ('root_cause', 'TEXT'),
+        ('troubleshooting_steps', 'TEXT'),
+        ('parts_used', 'TEXT'),
+        ('repair_evidence_url', 'TEXT'),
+        ('cancellation_reason', 'TEXT'),
+        ('preferred_datetime', 'TEXT')
+    ]:
+        try:
+            cur.execute(f"ALTER TABLE service_requests ADD COLUMN {col} {typ}")
+        except sqlite3.OperationalError:
+            pass
+
+    # 4. coverage_rules.is_active
+    try:
+        cur.execute("ALTER TABLE coverage_rules ADD COLUMN is_active INTEGER DEFAULT 1")
+    except sqlite3.OperationalError:
+        pass
+
+    # 5. parts_requests table
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS parts_requests (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            service_request_id INTEGER REFERENCES service_requests(id) ON DELETE CASCADE,
+            technician_id INTEGER REFERENCES users(id),
+            part_name TEXT NOT NULL,
+            part_number TEXT,
+            quantity INTEGER DEFAULT 1,
+            status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'approved', 'dispatched', 'delivered', 'rejected')),
+            notes TEXT,
+            requested_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    conn.commit()
+
 def init_db(force_reseed=False):
     db_exists = os.path.exists(DB_FILE)
     conn = get_db_connection()
     with open(SCHEMA_FILE, 'r') as f:
         conn.executescript(f.read())
     conn.commit()
+    run_migrations(conn)
 
     # Check if users already exist
     cur = conn.cursor()
     cur.execute("SELECT COUNT(*) FROM users")
     count = cur.fetchone()[0]
 
-    if count == 0 or force_reseed:
+    if force_reseed:
         seed_data(conn)
     conn.close()
 
@@ -36,6 +105,7 @@ def seed_data(conn):
     cur = conn.cursor()
 
     # Clear existing demo data if re-seeding
+    cur.execute("DELETE FROM parts_requests")
     cur.execute("DELETE FROM activity_logs")
     cur.execute("DELETE FROM reminders")
     cur.execute("DELETE FROM service_requests")
@@ -48,28 +118,34 @@ def seed_data(conn):
     # 1. Insert Users (4 Core Roles)
     users = [
         (
-            1, "Alex Vance", "alex@owner.com", hash_password("password123"),
-            "product_owner", "+1 (555) 234-5678",
-            "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
+            1, "Sahil Paranjpe", "sahilparanjpe@gmail.com", hash_password("12345678"),
+            "product_owner", "+91 98201 54932",
+            "https://ui-avatars.com/api/?name=Sahil+Paranjpe&background=2563eb&color=fff&bold=true",
             "Individual Consumer"
         ),
         (
-            2, "Sarah Connor", "sarah@servicecenter.com", hash_password("password123"),
-            "service_center_staff", "+1 (555) 345-6789",
-            "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80",
-            "Metro Central Service Hub"
+            2, "Yash Parab", "yashparab@gmail.com", hash_password("12345678"),
+            "service_center_staff", "+91 98334 21890",
+            "https://ui-avatars.com/api/?name=Yash+Parab&background=d97706&color=fff&bold=true",
+            "Metro Care Service Hub"
         ),
         (
-            3, "David Miller", "david@technician.com", hash_password("password123"),
-            "service_technician", "+1 (555) 456-7890",
-            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
-            "Apex Hardware Repairs"
+            3, "Rishil Parmar", "rishilparmar@gmail.com", hash_password("12345678"),
+            "service_technician", "+91 97690 44321",
+            "https://ui-avatars.com/api/?name=Rishil+Parmar&background=059669&color=fff&bold=true",
+            "Metro Care Service Hub"
         ),
         (
-            4, "Elena Rostova", "elena@admin.com", hash_password("password123"),
-            "warranty_admin", "+1 (555) 567-8901",
-            "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=150&q=80",
+            4, "Yash Parekh", "yashparekh@gmail.com", hash_password("12345678"),
+            "warranty_admin", "+91 98199 87654",
+            "https://ui-avatars.com/api/?name=Yash+Parekh&background=7c3aed&color=fff&bold=true",
             "Global Warranty Underwriters Ltd"
+        ),
+        (
+            5, "Alex Vance", "alex@owner.com", hash_password("password123"),
+            "product_owner", "+1 (555) 234-5678",
+            "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
+            "Individual Consumer"
         )
     ]
     cur.executemany("""
@@ -199,49 +275,13 @@ def seed_data(conn):
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, claims)
 
-    # 6. Service Requests
-    service_requests = [
-        (
-            1, "SR-2026-104", 1, 2, 1, 3, 2,
-            "MacBook Pro Display Panel Replacement",
-            "Replace Liquid Retina XDR display panel and calibrate True Tone sensor.",
-            "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=600&q=80",
-            "in_progress", "high",
-            "Display panel unpacked. Calibration tool connected. ETA 2 hours.",
-            "Today 09:30 - 11:30"
-        ),
-        (
-            2, "SR-2026-105", 3, 1, 1, 3, 2,
-            "Sony A7 IV Shutter Assembly Diagnosis",
-            "Inspect physical shutter curtain and test electronic sensor readout.",
-            "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=600&q=80",
-            "assigned", "medium",
-            "Device received at service bay. Technician David assigned.",
-            "Today 14:00 - 15:30"
-        ),
-        (
-            3, "SR-2026-092", 5, 3, 1, 3, 2,
-            "Dyson V15 Motor & Battery Replacement",
-            "Replace main battery module and conduct airflow CFM test.",
-            "https://images.unsplash.com/photo-1558317374-067fb5f30001?auto=format&fit=crop&w=600&q=80",
-            "completed", "medium",
-            "Replaced battery assembly. Run time tested at 62 mins in Eco mode.",
-            "Yesterday 11:00 - 12:00"
-        ),
-        (
-            4, "SR-2026-108", 2, None, 1, None, 2,
-            "Samsung S25 Ultra Type-C Port Inspection",
-            "Loose connection when charging; check port pins and lint obstruction.",
-            "https://images.unsplash.com/photo-1580910051074-3eb694886505?auto=format&fit=crop&w=600&q=80",
-            "pending", "low",
-            "New incoming request. Waiting for technician bay allocation.",
-            "Tomorrow 10:00 - 11:00"
-        )
-    ]
-    cur.executemany("""
-        INSERT INTO service_requests (id, request_number, product_id, claim_id, owner_id, assigned_technician_id, assigned_by_staff_id, issue_title, issue_description, photo_url, status, priority, technician_notes, scheduled_slot)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, service_requests)
+    # 6. Service Requests (Clean slate as requested - empty queue)
+    service_requests = []
+    if service_requests:
+        cur.executemany("""
+            INSERT INTO service_requests (id, request_number, product_id, claim_id, owner_id, assigned_technician_id, assigned_by_staff_id, issue_title, issue_description, photo_url, status, priority, technician_notes, scheduled_slot)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, service_requests)
 
     # 7. Reminders
     reminders = [
@@ -258,9 +298,9 @@ def seed_data(conn):
             "2026-05-10", "email", 1, 1
         ),
         (
-            3, 1, 1, 1, "service_due",
-            "Service Scheduled for MacBook Pro 16\"",
-            "Your service appointment #SR-2026-104 is scheduled for Today at 09:30 AM with Senior Tech David Miller.",
+            3, 1, 1, None, "claim_status",
+            "AppleCare+ Coverage Verified",
+            "Your MacBook Pro 16\" claim status is verified with full AppleCare+ hardware protection.",
             "2026-07-25", "push", 0, 1
         ),
         (
@@ -279,14 +319,20 @@ def seed_data(conn):
     activity_logs = [
         (1, 1, "Claim Filed", "claim", 1, "Alex Vance submitted claim CLM-2026-0081 for Sony A7 IV."),
         (2, 4, "Claim Approved", "claim", 2, "Warranty Admin Elena approved claim CLM-2026-0045 for ₹64,900.00."),
-        (3, 2, "Service Assigned", "service", 1, "Sarah Connor assigned Service Request #SR-2026-104 to David Miller."),
-        (4, 3, "Repair In Progress", "service", 1, "Tech David Miller updated SR-2026-104: Parts received, disassembly started."),
-        (5, 1, "OCR Invoice Uploaded", "invoice", 1, "OCR successfully extracted Apple BKC Mumbai invoice data with 99.4% confidence.")
+        (3, 1, "OCR Invoice Uploaded", "invoice", 1, "OCR successfully extracted Apple BKC Mumbai invoice data with 99.4% confidence.")
     ]
     cur.executemany("""
         INSERT INTO activity_logs (id, user_id, action, entity_type, entity_id, details)
         VALUES (?, ?, ?, ?, ?, ?)
     """, activity_logs)
+
+    # 9. Parts Requests (Empty by default)
+    parts_requests = []
+    if parts_requests:
+        cur.executemany("""
+            INSERT INTO parts_requests (id, service_request_id, technician_id, part_name, part_number, quantity, status, notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, parts_requests)
 
     conn.commit()
 
